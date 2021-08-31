@@ -5,7 +5,7 @@ import { IBotCommand } from "./api/capi";
 import { IBotEvent } from "./api/eapi";
 var userBehavior = new db.table('user');
 const myIntents = new Discord.Intents();
-myIntents.add(Discord.Intents.FLAGS.GUILD_PRESENCES, Discord.Intents.FLAGS.GUILD_MEMBERS,Discord.Intents.FLAGS.GUILD_MESSAGES);
+myIntents.add(Discord.Intents.FLAGS.GUILDS,Discord.Intents.FLAGS.GUILD_MEMBERS,Discord.Intents.FLAGS.GUILD_MESSAGES);
 const Bot: Discord.Client = new Discord.Client({intents: myIntents});
 
 
@@ -31,9 +31,7 @@ function randint(min: number,max: number) // min and max included
 
 Bot.on("ready", () => {
     console.log("This bot is online!"); //standard protocol when starting up the bot
-    //Bot.user!.setPresence({ activity: {type: "WATCHING", name: 'you through your window' }, status: 'dnd' })
-    //.then(console.log)
-  //  .catch(console.error);
+    Bot.user!.setPresence({ activities: [{ name: 'with ailun' }], status: 'idle' });
 
     Bot.users.cache.forEach((user: Discord.User) => {
         if (!db.has(user.id)){ //if User ID is not already in database (db) then add them, else do nothing

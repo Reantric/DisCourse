@@ -21,7 +21,7 @@ export default class ping implements IBotCommand {
     }
 
     async runCommand(args: string[], msg: Discord.Message, Bot: Discord.Client): Promise<void> {
+        console.log("hello");
         msg.reply("Pong!");
-    
 }
 }
