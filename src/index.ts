@@ -4,7 +4,11 @@ var db = require('quick.db');
 import { IBotCommand } from "./api/capi";
 import { IBotEvent } from "./api/eapi";
 var userBehavior = new db.table('user');
-const Bot: Discord.Client = new Discord.Client();
+const myIntents = new Discord.Intents();
+myIntents.add(Discord.Intents.FLAGS.GUILD_PRESENCES, Discord.Intents.FLAGS.GUILD_MEMBERS,Discord.Intents.FLAGS.GUILD_MESSAGES);
+const Bot: Discord.Client = new Discord.Client({intents: myIntents});
+
+
 const request = require('request');
 const fs = require('fs');
 //Required imports
@@ -27,17 +31,15 @@ function randint(min: number,max: number) // min and max included
 
 Bot.on("ready", () => {
     console.log("This bot is online!"); //standard protocol when starting up the bot
-    Bot.user!.setPresence({ activity: {type: "WATCHING", name: 'you through your window' }, status: 'dnd' })
+    //Bot.user!.setPresence({ activity: {type: "WATCHING", name: 'you through your window' }, status: 'dnd' })
     //.then(console.log)
-    .catch(console.error);
+  //  .catch(console.error);
 
-    let allUsers = Bot.users.cache.array(); //get all Users and store them in an array
-    for (let i = 0; i < allUsers.length; i++){
-        if (!db.has(allUsers[i].id)){ //if User ID is not already in database (db) then add them, else do nothing
-            db.set(allUsers[i].id,{msgArray:[],sentiment:NaN,strikes:0,recycleAmt:0})
+    Bot.users.cache.forEach((user: Discord.User) => {
+        if (!db.has(user.id)){ //if User ID is not already in database (db) then add them, else do nothing
+            db.set(user.id,{msgArray:[],sentiment:NaN,strikes:0,recycleAmt:0})
         }
-    } 
-    
+    }); 
 })
 
 Bot.on("guildMemberAdd", member => {
@@ -49,11 +51,11 @@ Bot.on("guildMemberAdd", member => {
     member.roles.add(role);
 })
 
-Bot.on("message", msg => {
+Bot.on("messageCreate", msg => {
     if (msg.author.bot) return;
     handleEvent(msg); // checks every message regardless of what it contains
     if (!msg.content.startsWith('!')) return;
-    if (msg.channel.type == 'dm'){
+    if (msg.channel.type == 'DM'){
         msg.author.send(`Please talk to me on a server! This ensures more engagement and reliability.`);
         return;
     } //makes sure that user cannot talk to bot on direct message, must be server!
