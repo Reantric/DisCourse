@@ -28,9 +28,19 @@ export default class getbanlist implements IBotInteraction {
 		.setName(this.name())
 		.setDescription(this.help())
 		.addUserOption((option: { setName: (arg0: string) => { (): any; new(): any; setDescription: { (arg0: string): any; new(): any; }; }; }) => option.setName(this.name()).setDescription(this.help()))
+        .addStringOption((option:any) =>
+            option.setName('category')
+                .setDescription('The gif category'));
+                // //.setRequired(true)
+                // .addChoice('Funny', 'gif_funny')
+                // .addChoice('Meme', 'gif_meme')
+                // .addChoice('Movie', 'gif_movie'))
+        
     }
 
-    async runCommand(args: string[], interaction: any, Bot: Discord.Client): Promise<void> {
+    async runCommand( interaction: any, Bot: Discord.Client): Promise<void> {
+        const string = interaction.options.getString('category');
+        console.log(string)
         const embed = new Discord.MessageEmbed()
         .setTitle('Eclipse Help is Here!')
         .setDescription('Here are a list of our commands!')
