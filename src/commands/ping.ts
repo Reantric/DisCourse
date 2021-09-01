@@ -1,8 +1,8 @@
 import * as Discord from "discord.js";
-import { IBotCommand } from "../api/capi";
+import { IBotInteraction } from "../api/capi";
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-
-export default class ping implements IBotCommand {
+export default class ping implements IBotInteraction {
     private readonly aliases = ["ping","pong"]
 
     name(): string {
@@ -16,12 +16,25 @@ export default class ping implements IBotCommand {
     cooldown(): number{
         return 2;
     }
-    isThisCommand(command: string): boolean {
+    isThisInteraction(command: string): boolean {
         return this.aliases.includes(command);
     }
 
-    async runCommand(args: string[], msg: Discord.Message, Bot: Discord.Client): Promise<void> {
-        console.log("hello");
-        msg.reply("Pong!");
-}
+    data(): any {
+        return new SlashCommandBuilder()
+		.setName(this.name())
+		.setDescription(this.help())
+		.addUserOption((option: { setName: (arg0: string) => { (): any; new(): any; setDescription: { (arg0: string): any; new(): any; }; }; }) => option.setName('target').setDescription('The user\'s avatar to show'))
+    }
+
+    async runCommand(args: string[], interaction: any, Bot: Discord.Client): Promise<void> {
+        const row = new Discord.MessageActionRow()
+			.addComponents(
+				new Discord.MessageButton()
+					.setCustomId('primary')
+					.setLabel('Primary')
+					.setStyle('PRIMARY'),
+			);
+		await interaction.reply({ content: 'Pong!', components: [row] });
+    }
 }
