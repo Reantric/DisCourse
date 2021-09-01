@@ -16,6 +16,7 @@ export default class ping implements IBotInteraction {
     cooldown(): number{
         return 2;
     }
+
     isThisInteraction(command: string): boolean {
         return this.aliases.includes(command);
     }
@@ -24,10 +25,13 @@ export default class ping implements IBotInteraction {
         return new SlashCommandBuilder()
 		.setName(this.name())
 		.setDescription(this.help())
-		.addUserOption((option: { setName: (arg0: string) => { (): any; new(): any; setDescription: { (arg0: string): any; new(): any; }; }; }) => option.setName(this.name()).setDescription(this.help()))
+		.addStringOption((option:any) =>
+		option.setName('input')
+			.setDescription('The input to echo back')
+			.setRequired(true));
     }
 
-    async runCommand(args: string[], interaction: any, Bot: Discord.Client): Promise<void> {
+    async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         const row = new Discord.MessageActionRow()
 			.addComponents(
 				new Discord.MessageButton()

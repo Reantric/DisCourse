@@ -5,7 +5,7 @@ export interface IBotInteraction { //basically the blueprint for all interaction
     help(): string;
     cooldown(): number;
     isThisInteraction(command: string): boolean; //make sure commands are all checked (i could get rid of this but its a nice safeguard along with config.ts!)
-    runCommand(args: string[], interaction: Discord.Interaction, Bot: Discord.Client): Promise<void>; /*give the args, int and bot, and is of type Promise<void> 
+    runCommand(interaction: Discord.Interaction, Bot: Discord.Client): Promise<void>; /*give the args, int and bot, and is of type Promise<void> 
     which all that really means is that it's expecting the data to be asynchronous; not orderly. Basically it'll be a lot more lenient with you ;D
     */
    data(): any // return data of slash command so json can be applied

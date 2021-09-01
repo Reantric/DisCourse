@@ -105,7 +105,7 @@ async function handleCommand(interaction: any){
             }
             timestamps.set(interaction.member?.user.id, now); //user = key, time = val
             setTimeout(() => timestamps.delete(interaction.member?.user.id), cooldownAmount); //wait cooldownAmt!
-            await commandClass.runCommand(args,interaction,Bot); //allows asynchronous operation and multithreading so multiple things can happen at once! also executes the cmd!
+            await commandClass.runCommand(interaction,Bot); //allows asynchronous operation and multithreading so multiple things can happen at once! also executes the cmd!
         }
         catch(e){
             console.log(e);
