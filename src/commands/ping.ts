@@ -24,7 +24,7 @@ export default class ping implements IBotInteraction {
         return new SlashCommandBuilder()
 		.setName(this.name())
 		.setDescription(this.help())
-		.addUserOption((option: { setName: (arg0: string) => { (): any; new(): any; setDescription: { (arg0: string): any; new(): any; }; }; }) => option.setName('target').setDescription('The user\'s avatar to show'))
+		.addUserOption((option: { setName: (arg0: string) => { (): any; new(): any; setDescription: { (arg0: string): any; new(): any; }; }; }) => option.setName(this.name()).setDescription(this.help()))
     }
 
     async runCommand(args: string[], interaction: any, Bot: Discord.Client): Promise<void> {
