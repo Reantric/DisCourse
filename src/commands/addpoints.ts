@@ -34,5 +34,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     const int1 = interaction.options.getInteger('points')
     console.log(int1)
     db.add(`${interaction.member.user.id}.questions`,int1)
+    console.log(db.get(`${interaction.member.user.id}.questions`));
+    interaction.reply({content: `You added ${int1} point(s)`, ephemeral:true});
 }
 }
