@@ -30,20 +30,25 @@ function randint(min: number,max: number) // min and max included
         return Math.floor(Math.random()*(max-min+1)+min);
 }
 
+const vals = {
+    questions: [],
+    points:0,
+}
+
 Bot.once("ready", () => {
     console.log("This bot is online!"); //standard protocol when starting up the bot
     Bot.user!.setPresence({ activities: [{ name: 'with ailun' }], status: 'idle' });
 
     Bot.users.cache.forEach((user: Discord.User) => {
         if (!db.has(user.id)){ //if User ID is not already in database (db) then add them, else do nothing
-            db.set(user.id,{msgArray:[],sentiment:NaN,strikes:0,recycleAmt:0})
+            db.set(user.id,vals)
         }
     }); 
 })
 
 Bot.on("guildMemberAdd", member => {
    if (!db.has(member.id)){ //if new member not in db, add them!
-    db.set(member.id,{msgArray:[],sentiment:NaN,strikes:0,recycleAmt:0})
+    db.set(member.id,vals)
    }
    console.log(member.user)
    var role: any = member.guild.roles.cache.find(role => role.id == "822258289814536203");
@@ -51,7 +56,11 @@ Bot.on("guildMemberAdd", member => {
 })
 
 Bot.on("interactionCreate", async (interaction: Discord.Interaction) => {
-    console.log("ailoo")
+    //console.log(interaction)
+    if (interaction.isButton()){
+        
+    }
+
 	if (!interaction.isCommand()) return;
     handleCommand(interaction);
 });
@@ -92,14 +101,14 @@ async function handleCommand(interaction: any){
             if (timestamps.has(interaction.member?.user.id)) { //checks to see if user in col
                 const expirationTime: number = timestamps.get(interaction.member?.user.id) + cooldownAmount; //expiration is time assigned to user + cooldownAmt
             
-                if (now < expirationTime) {
+                if (now < expirationTime) { // This code is absolutely abysmal, my god
                     const timeLeft = (expirationTime - now) / 1000;
                     if (timeLeft > 3600){
-                        return interaction.reply(`please wait ${Math.round(timeLeft/3600)} more hour(s) before reusing the \`${commandClass.name()}\` command.`);
+                        return interaction.reply({ephemeral: true, content: `please wait ${Math.round(timeLeft/3600)} more hour(s) before reusing the \`${commandClass.name()}\` command.`});
                     } else if (timeLeft > 60 && timeLeft < 3600){
-                        return interaction.reply(`please wait ${Math.round(timeLeft/60)} more minute(s) before reusing the \`${commandClass.name()}\` command.`);
+                        return interaction.reply({ephemeral: true, content:`please wait ${Math.round(timeLeft/60)} more minute(s) before reusing the \`${commandClass.name()}\` command.`});
                     } else {
-                    return interaction.reply(`please wait ${Math.round(timeLeft)} more second(s) before reusing the \`${commandClass.name()}\` command.`);
+                    return interaction.reply({ephemeral: true, content:`please wait ${Math.round(timeLeft)} more second(s) before reusing the \`${commandClass.name()}\` command.`});
                 } //if hours, run 1, if min, run2, else run3
             }
             }
@@ -123,7 +132,6 @@ function loadCommands(commandsPath: string){
 
         const command = new commandsClass() as IBotInteraction; //command now follows same layout as IBotCommand in form commandsClass(), created new object
         commands.push(command); //adds commands to command array
-        console.log(__dirname);
         commandDatas.push(command.data().toJSON())
     }
 

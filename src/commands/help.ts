@@ -58,7 +58,7 @@ export default class getbanlist implements IBotInteraction {
         .setThumbnail('https://wallpapercave.com/wp/wp4055520.png')
         .setTimestamp()
     
-    interaction.reply({embeds: [embed]});   
+    interaction.reply({embeds: [embed], ephemeral: true});   
     /*let arr = db.all();
     for(let i = 0; i<arr.length; i++){
         
