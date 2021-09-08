@@ -11,46 +11,42 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Discord = require("discord.js");
 const { SlashCommandBuilder } = require('@discordjs/builders');
-class getbanlist {
-    constructor() {
-        this.aliases = ["help"];
-    }
+class help {
     name() {
         return "help";
     }
     help() {
-        return "help";
+        return "Gives a list of all commands available to you";
     }
     cooldown() {
         return 2;
     }
     isThisInteraction(command) {
-        return this.aliases.includes(command);
+        return command === "help";
     }
     data() {
         return new SlashCommandBuilder()
             .setName(this.name())
-            .setDescription(this.help())
-            .addUserOption((option) => option.setName(this.name()).setDescription(this.help()))
-            .addStringOption((option) => option.setName('category')
-            .setDescription('The gif category'));
+            .setDescription(this.help());
     }
     runCommand(interaction, Bot) {
         return __awaiter(this, void 0, void 0, function* () {
-            const string = interaction.options.getString('category');
-            console.log(string);
-            const embed = new Discord.MessageEmbed()
-                .setTitle('Eclipse Help is Here!')
-                .setDescription('Here are a list of our commands!')
-                .setColor('#0ae090')
-                .setAuthor(Bot.user.username, Bot.user.avatarURL())
-                .addFields({ name: '!banlist (MOD ONLY)', value: 'Replies with the list of banned users from the server' })
-                .addFields({ name: '!leaderboard, !lb', value: 'Gives leaderboard of the top ten most positive members based on sentiment scores' })
-                .setThumbnail('https://wallpapercave.com/wp/wp4055520.png')
-                .setTimestamp();
+            let embed = new Discord.MessageEmbed();
+            if (interaction.member.roles.cache.some((role) => role.name === 'Student')) {
+                embed.setTitle('DisCourse Command List')
+                    .setDescription('Here are a list of our student commands.')
+                    .setColor('#5865F2')
+                    .addFields({ name: "/help", value: "Shows all available commands for that user" }, { name: "/leaderboard", value: "Shows the top 10 members with the most points in the class" }, { name: "/askq", value: "Ask a question that can be answered by other students or a teacher" }, { name: "/replys", value: "Reply to a question another student has asked" }, { name: "/answerq", value: "Answer an open-ended question a teacher has asked" });
+            }
+            else if (interaction.member.roles.cache.some((role) => role.name === 'Teacher')) {
+                embed.setTitle('DisCourse Command List')
+                    .setDescription('Here are a list of our teacher commands.')
+                    .setColor('#5865F2')
+                    .addFields({ name: "/help", value: "Shows all available commands for that user" }, { name: "/attendance", value: "Sends a message to all students so that they can mark that they are present; the message will disappear after a certain amount of time" }, { name: "/strike", value: "Mutes target user for certain amount of time and warns them with a custom message" }, { name: "/announcement", value: "Sends a message visible to all students in a channel" }, { name: "/replyt", value: "Reply to a question a student has asked" }, { name: "/changepoints", value: "Change the number of points a student has by adding or subtracting a certain amount" }, { name: "/leaderboard", value: "Shows the top 10 members with the most points in the class" }, { name: "/mcq", value: "Create a multiple choice question that students can answer within a specified time and gives points if answered correctly" }, { name: "/oeq", value: "Create an open-ended question that students can answer within a specified time and gives points if answered correctly" }, { name: "/mcq", value: "Create a multiple choice question that students can answer within a specified time and gives points if answered correctly" });
+            }
             interaction.reply({ embeds: [embed], ephemeral: true });
         });
     }
 }
-exports.default = getbanlist;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaGVscC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb21tYW5kcy9oZWxwLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7O0FBQUEsc0NBQXNDO0FBR3RDLE1BQU0sRUFBRSxtQkFBbUIsRUFBRSxHQUFHLE9BQU8sQ0FBQyxxQkFBcUIsQ0FBQyxDQUFDO0FBRy9ELE1BQXFCLFVBQVU7SUFBL0I7UUFFcUIsWUFBTyxHQUFHLENBQUMsTUFBTSxDQUFDLENBQUE7SUEyRHZDLENBQUM7SUF6REcsSUFBSTtRQUNBLE9BQU8sTUFBTSxDQUFDO0lBQ2xCLENBQUM7SUFFRCxJQUFJO1FBQ0EsT0FBTyxNQUFNLENBQUM7SUFDbEIsQ0FBQztJQUVELFFBQVE7UUFDSixPQUFPLENBQUMsQ0FBQztJQUNiLENBQUM7SUFDRCxpQkFBaUIsQ0FBQyxPQUFlO1FBQzdCLE9BQU8sSUFBSSxDQUFDLE9BQU8sQ0FBQyxRQUFRLENBQUMsT0FBTyxDQUFDLENBQUM7SUFDMUMsQ0FBQztJQUVELElBQUk7UUFDQSxPQUFPLElBQUksbUJBQW1CLEVBQUU7YUFDckMsT0FBTyxDQUFDLElBQUksQ0FBQyxJQUFJLEVBQUUsQ0FBQzthQUNwQixjQUFjLENBQUMsSUFBSSxDQUFDLElBQUksRUFBRSxDQUFDO2FBQzNCLGFBQWEsQ0FBQyxDQUFDLE1BQXNILEVBQUUsRUFBRSxDQUFDLE1BQU0sQ0FBQyxPQUFPLENBQUMsSUFBSSxDQUFDLElBQUksRUFBRSxDQUFDLENBQUMsY0FBYyxDQUFDLElBQUksQ0FBQyxJQUFJLEVBQUUsQ0FBQyxDQUFDO2FBQzVMLGVBQWUsQ0FBQyxDQUFDLE1BQVUsRUFBRSxFQUFFLENBQzVCLE1BQU0sQ0FBQyxPQUFPLENBQUMsVUFBVSxDQUFDO2FBQ3JCLGNBQWMsQ0FBQyxrQkFBa0IsQ0FBQyxDQUFDLENBQUM7SUFNakQsQ0FBQztJQUVLLFVBQVUsQ0FBRSxXQUFnQixFQUFFLEdBQW1COztZQUNuRCxNQUFNLE1BQU0sR0FBRyxXQUFXLENBQUMsT0FBTyxDQUFDLFNBQVMsQ0FBQyxVQUFVLENBQUMsQ0FBQztZQUN6RCxPQUFPLENBQUMsR0FBRyxDQUFDLE1BQU0sQ0FBQyxDQUFBO1lBQ25CLE1BQU0sS0FBSyxHQUFHLElBQUksT0FBTyxDQUFDLFlBQVksRUFBRTtpQkFDdkMsUUFBUSxDQUFDLHVCQUF1QixDQUFDO2lCQUNqQyxjQUFjLENBQUMsa0NBQWtDLENBQUM7aUJBQ2xELFFBQVEsQ0FBQyxTQUFTLENBQUM7aUJBQ25CLFNBQVMsQ0FBQyxHQUFHLENBQUMsSUFBSyxDQUFDLFFBQVEsRUFBRSxHQUFHLENBQUMsSUFBSyxDQUFDLFNBQVMsRUFBRyxDQUFDO2lCQUdyRCxTQUFTLENBQ04sRUFBRSxJQUFJLEVBQUUscUJBQXFCLEVBQUUsS0FBSyxFQUFFLHVEQUF1RCxFQUFFLENBQ2xHO2lCQUVBLFNBQVMsQ0FDTixFQUFFLElBQUksRUFBQyxtQkFBbUIsRUFBRSxLQUFLLEVBQUMsa0ZBQWtGLEVBQUMsQ0FDeEg7aUJBQ0EsWUFBWSxDQUFDLDRDQUE0QyxDQUFDO2lCQUMxRCxZQUFZLEVBQUUsQ0FBQTtZQUVuQixXQUFXLENBQUMsS0FBSyxDQUFDLEVBQUMsTUFBTSxFQUFFLENBQUMsS0FBSyxDQUFDLEVBQUUsU0FBUyxFQUFFLElBQUksRUFBQyxDQUFDLENBQUM7UUFNMUQsQ0FBQztLQUFBO0NBQ0E7QUE3REQsNkJBNkRDIn0=
+exports.default = help;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaGVscC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb21tYW5kcy9oZWxwLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7O0FBQUEsc0NBQXNDO0FBRXRDLE1BQU0sRUFBRSxtQkFBbUIsRUFBRSxHQUFHLE9BQU8sQ0FBQyxxQkFBcUIsQ0FBQyxDQUFDO0FBRy9ELE1BQXFCLElBQUk7SUFFckIsSUFBSTtRQUNBLE9BQU8sTUFBTSxDQUFDO0lBQ2xCLENBQUM7SUFFRCxJQUFJO1FBQ0EsT0FBTywrQ0FBK0MsQ0FBQztJQUMzRCxDQUFDO0lBRUQsUUFBUTtRQUNKLE9BQU8sQ0FBQyxDQUFDO0lBQ2IsQ0FBQztJQUNELGlCQUFpQixDQUFDLE9BQWU7UUFDN0IsT0FBTyxPQUFPLEtBQUssTUFBTSxDQUFDO0lBQzlCLENBQUM7SUFFRCxJQUFJO1FBQ0EsT0FBTyxJQUFJLG1CQUFtQixFQUFFO2FBQ3JDLE9BQU8sQ0FBQyxJQUFJLENBQUMsSUFBSSxFQUFFLENBQUM7YUFDcEIsY0FBYyxDQUFDLElBQUksQ0FBQyxJQUFJLEVBQUUsQ0FBQyxDQUFBO0lBQzFCLENBQUM7SUFFSyxVQUFVLENBQUMsV0FBZ0IsRUFBRSxHQUFtQjs7WUFDbEQsSUFBSSxLQUFLLEdBQUcsSUFBSSxPQUFPLENBQUMsWUFBWSxFQUFFLENBQUM7WUFDdkMsSUFBSSxXQUFXLENBQUMsTUFBTSxDQUFDLEtBQUssQ0FBQyxLQUFLLENBQUMsSUFBSSxDQUFDLENBQUMsSUFBdUIsRUFBRSxFQUFFLENBQUMsSUFBSSxDQUFDLElBQUksS0FBSyxTQUFTLENBQUMsRUFBQztnQkFDMUYsS0FBSyxDQUFDLFFBQVEsQ0FBQyx3QkFBd0IsQ0FBQztxQkFDdkMsY0FBYyxDQUFDLDBDQUEwQyxDQUFDO3FCQUMxRCxRQUFRLENBQUMsU0FBUyxDQUFDO3FCQUNuQixTQUFTLENBQ04sRUFBQyxJQUFJLEVBQUMsT0FBTyxFQUFFLEtBQUssRUFBQyw0Q0FBNEMsRUFBQyxFQUNsRSxFQUFDLElBQUksRUFBQyxjQUFjLEVBQUUsS0FBSyxFQUFDLDREQUE0RCxFQUFDLEVBQ3pGLEVBQUMsSUFBSSxFQUFDLE9BQU8sRUFBRSxLQUFLLEVBQUMsb0VBQW9FLEVBQUMsRUFDMUYsRUFBQyxJQUFJLEVBQUMsU0FBUyxFQUFFLEtBQUssRUFBQywrQ0FBK0MsRUFBQyxFQUN2RSxFQUFDLElBQUksRUFBQyxVQUFVLEVBQUUsS0FBSyxFQUFDLG1EQUFtRCxFQUFDLENBQy9FLENBQUM7YUFDTDtpQkFDSSxJQUFHLFdBQVcsQ0FBQyxNQUFNLENBQUMsS0FBSyxDQUFDLEtBQUssQ0FBQyxJQUFJLENBQUMsQ0FBQyxJQUF1QixFQUFFLEVBQUUsQ0FBQyxJQUFJLENBQUMsSUFBSSxLQUFLLFNBQVMsQ0FBQyxFQUFDO2dCQUM5RixLQUFLLENBQUMsUUFBUSxDQUFDLHdCQUF3QixDQUFDO3FCQUN2QyxjQUFjLENBQUMsMENBQTBDLENBQUM7cUJBQzFELFFBQVEsQ0FBQyxTQUFTLENBQUM7cUJBQ25CLFNBQVMsQ0FDTixFQUFDLElBQUksRUFBQyxPQUFPLEVBQUUsS0FBSyxFQUFDLDRDQUE0QyxFQUFDLEVBQ2xFLEVBQUMsSUFBSSxFQUFDLGFBQWEsRUFBRSxLQUFLLEVBQUMsd0lBQXdJLEVBQUMsRUFDcEssRUFBQyxJQUFJLEVBQUMsU0FBUyxFQUFFLEtBQUssRUFBQyxtRkFBbUYsRUFBQyxFQUMzRyxFQUFDLElBQUksRUFBQyxlQUFlLEVBQUUsS0FBSyxFQUFDLHNEQUFzRCxFQUFDLEVBQ3BGLEVBQUMsSUFBSSxFQUFDLFNBQVMsRUFBRSxLQUFLLEVBQUMseUNBQXlDLEVBQUMsRUFDakUsRUFBQyxJQUFJLEVBQUMsZUFBZSxFQUFFLEtBQUssRUFBQyxxRkFBcUYsRUFBQyxFQUNuSCxFQUFDLElBQUksRUFBQyxjQUFjLEVBQUUsS0FBSyxFQUFDLDREQUE0RCxFQUFDLEVBQ3pGLEVBQUMsSUFBSSxFQUFDLE1BQU0sRUFBRSxLQUFLLEVBQUMsMkhBQTJILEVBQUMsRUFDaEosRUFBQyxJQUFJLEVBQUMsTUFBTSxFQUFFLEtBQUssRUFBQyx1SEFBdUgsRUFBQyxFQUM1SSxFQUFDLElBQUksRUFBQyxNQUFNLEVBQUUsS0FBSyxFQUFDLDJIQUEySCxFQUFDLENBQ25KLENBQUM7YUFDTDtZQUNMLFdBQVcsQ0FBQyxLQUFLLENBQUMsRUFBQyxNQUFNLEVBQUUsQ0FBQyxLQUFLLENBQUMsRUFBRSxTQUFTLEVBQUUsSUFBSSxFQUFDLENBQUMsQ0FBQztRQUMxRCxDQUFDO0tBQUE7Q0FDQTtBQXhERCx1QkF3REMifQ==
