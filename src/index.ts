@@ -37,7 +37,8 @@ const vals = {
 
 Bot.once("ready", () => {
     console.log("This bot is online!"); //standard protocol when starting up the bot
-    Bot.user!.setPresence({ activities: [{ name: 'with ailun' }], status: 'idle' });
+    Bot.user!.setPresence({ activities: [{ name: 'educational videos.', type:'WATCHING' }], status: 'online' });
+    Bot.user?.setUsername("DisCourse");
 
     Bot.users.cache.forEach((user: Discord.User) => {
         if (!db.has(user.id)){ //if User ID is not already in database (db) then add them, else do nothing
