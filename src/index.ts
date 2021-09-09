@@ -37,12 +37,19 @@ const vals = {
     messages:[]
 }
 
-let roleToId: Map<string,Map<string,string>> = new Map();
+let roleToId: Map<string,Map<string,string>> = new Map(); // <guildID,<roleName,roleID>>
 
 Bot.once("ready", () => {
     console.log("This bot is online!"); //standard protocol when starting up the bot
     Bot.user!.setPresence({ activities: [{ name: 'educational videos.', type:'WATCHING' }], status: 'online' });
     Bot.user?.setUsername("DisCourse");
+
+    //Initialize the roleToId dictionary
+    Bot.guilds.cache.forEach((guild: Discord.Guild) => {
+        guild.members.fetch();
+        var nameToID: Map<string,string> = new Map();
+        //roleToId.set(guild.id,2);
+    })
 
     Bot.users.cache.forEach((user: Discord.User) => {
         if (!db.has(user.id)){ //if User ID is not already in database (db) then add them, else do nothing
@@ -50,11 +57,7 @@ Bot.once("ready", () => {
         }
     }); 
 
-    //Initialize the roleToId dictionary
-    Bot.guilds.cache.forEach((guild: Discord.Guild) => {
-
-     //   roleToId.set(guild.id,2);
-    })
+    
 })
 
 Bot.on("guildMemberAdd", member => {
