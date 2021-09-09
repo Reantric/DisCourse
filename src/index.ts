@@ -45,20 +45,28 @@ Bot.once("ready", async () => {
     Bot.user?.setUsername("DisCourse");
 
     
-    await Bot.guilds.fetch();
-    Bot.guilds.cache.forEach(async (guild: Discord.Guild) => {
-        await guild.members.fetch();
-        guild.members.cache.forEach((user: Discord.GuildMember) => {
-            if (!db.has(user.id)){ //if User ID is not already in database (db) then add them, else do nothing
-                db.set(user.id,vals)
-            }
-        })
+    Bot.guilds.fetch().then(() => {
+        Bot.guilds.cache.forEach(async (guild: Discord.Guild) => {
+            guild.members.fetch().then(() => {
+                guild.members.cache.forEach((user: Discord.GuildMember) => {
+                    if (!db.has(user.id)){ //if User ID is not already in database (db) then add them, else do nothing
+                        db.set(user.id,vals)
+                    }
+                })
+        
+             /*   //Initialize the roleToId dictionary
+                var nameToID: Map<string,string> = new Map();
+                guild.roles.fetch().then(() => {
 
-        //Initialize the roleToId dictionary
-        var nameToID: Map<string,string> = new Map();
-        //roleToId.set(guild.id,2);
+                });
+                
+                //roleToId.set(guild.id,2); */
+            })
+            
+        })
     })
-})
+    })
+    
 
 Bot.on("guildMemberAdd", member => {
    if (!db.has(member.id)){ //if new member not in db, add them!
@@ -89,14 +97,6 @@ Bot.on("messageCreate", msg => {
 })
 
 async function handleEvent(msg: Discord.Message){
-    let arr=db.get(`${msg.author.id}.messages`)
-    if (arr.length < 10){ // if not full
-        db.push(`${msg.author.id}.messages`,msg.content);
-    }
-    else {
-        db.set(`${msg.author.id}.messages`,[])
-    }
-        
     for (const eventClass of events){
         await eventClass.runEvent(msg,Bot);
     }
