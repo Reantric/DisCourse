@@ -10,22 +10,19 @@ export function confidence(x: number, n: number) {
 //do i need that what does it even
 //when i wrote this code, only god and i knew how it worked
 //now only god knows it!
+
 function cTC(a: (number)[], b: (number)[]) {
     if (isNaN(a[1]))
         return 1;
     if (isNaN(b[1]))
         return -1;
 
-    if (a[1] === b[1]) {
-        if (a[2] > b[2])
-            return 1;
-        else if (b[2] < a[2])
-            return -1;
+    if (a[1] === b[1]) 
         return 0;
-    }
-    else {
+    
+    else 
         return (a[1] < b[1]) ? 1 : -1;
-    }
+    
 }
 
 export default class leaderboard implements IBotInteraction {
@@ -53,25 +50,28 @@ export default class leaderboard implements IBotInteraction {
     }
 
     async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
+
         let userArray:any=[];
         let guildArray=interaction.guild!.members.cache.map((element: any)=>{
             return element.id 
         })
+
         for(const o of db.all()){
-            if (o.ID == "817230166824321054")
+            if (o.ID == "885542468693676054")
                 continue;
             if(guildArray.includes(o.ID)){
-
-            let senti = o.data.points;
-            if (senti == undefined || senti == null)
-                senti = NaN;
-            userArray.push([o.ID, senti])
+                let pts;
+                if (typeof o.data === 'string')
+                    pts = JSON.parse(o.data).points;
+                else
+                    pts = o.data.points;
+            userArray.push([o.ID, pts])
             }
         }
         userArray.sort(cTC)
-    //    console.log(userArray)
+      //  console.log(userArray);
         const embed = new Discord.MessageEmbed()
-        .setTitle('Positivity Leaderboard!')
+        .setTitle('Points Leaderboard!')
         
         .setColor('#0099ff')
         .setAuthor(Bot.user!.username, Bot.user!.avatarURL()!)
@@ -116,7 +116,9 @@ export default class leaderboard implements IBotInteraction {
                 bruh = "nine"
                 break;
         }
-        embed.setDescription(`Here are the top ${bruh} most positive people in the server!`)
+
+
+        embed.setDescription(`Here are the top ${bruh} students who have accumulated the most points!`)
         let average: any = 0, activeCount = 0;
         for (const c of userArray){
             if (!isNaN(c[1])){
@@ -136,6 +138,7 @@ export default class leaderboard implements IBotInteraction {
             let username = Bot.users.cache.find(user => user.id === userArray[i][0])?.username;//cannot read property 0 of indefined
             let rounded;
                 if(isNaN(userArray[i][1])){
+                    console.log(username,userArray[i]);
                     rounded = NaN;
                     userArray[i][1] = "N/A";
         }
@@ -153,25 +156,17 @@ export default class leaderboard implements IBotInteraction {
                 else if(i==2)
                         initializer = `<:third_place:822887031143137321>`;
 
-                let confidence = "";
-                if (!isNaN(rounded)){
-                    const n = userArray[i][2];
-                    confidence = `± ${(1-n/(n+1)).toFixed(2)}`
-                }
 
                 if (userArray[i][0] == interaction.member.user.id)
                     embed.addFields(
-                        { name:`${initializer} **#${(i+1)}: ${username}**`, value: `**${userArray[i][1]} ${confidence} ()**`},)
+                        { name:`${initializer} **#${(i+1)}: ${username}**`, value: `**${userArray[i][1]}**`},)
                  else
                     embed.addFields(
-                        { name:`${initializer} #${(i+1)}: ${username}`, value: `${userArray[i][1]} ${confidence} ()`},)
-                
-                
+                        { name:`${initializer} #${(i+1)}: ${username}`, value: `${userArray[i][1]}`},)
         }
         
         embed.setTimestamp()
-        let ind = this.search(userArray,interaction.author.id);
-        let rounded = db.get(`${interaction.author.id}.recycleAmt`) == 0 ? NaN : Math.round(userArray[ind][1]*2)/2;
+        let ind = this.search(userArray,interaction.member.user.id);
         let initializer = "";
 
                 if(ind==0)
@@ -182,14 +177,9 @@ export default class leaderboard implements IBotInteraction {
                         initializer = `<:third_place:822887031143137321>`;
         
                         
-        if (db.get(`${interaction.author.id}.recycleAmt`) == 0)                
-            embed.addField(`${initializer} **#${ind+1}: ${interaction.author.username}**`,`**N/A ()**`)
-        else{
-            const n = userArray[ind][2];
-            let confidence = `± ${(1-n/(n+1)).toFixed(2)}`
-                
-            embed.addField(`${initializer} **#${ind+1}: ${interaction.author.username}**`,`**${Number(userArray[ind][1]).toFixed(2)} ${confidence} ()**`)
-        }
+
+        embed.addField(`${initializer} **#${ind+1}: ${interaction.member.user.username}**`,`**${Number(userArray[ind][1]).toFixed(2)}**`)
+        
 
         //interaction.channel.send(embed)
                 
