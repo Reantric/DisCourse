@@ -49,7 +49,7 @@ export default class strike implements IBotInteraction {
 
         if(db.get(`${user.id}.strikes`)>=3){//if a student has at least three strikes then given the Mute role
             if(user.roles.cache.some((role:any) => role.name === 'Mute')){
-                interaction.reply({content: "This user has already been muted, but a strike was still added.", ephemeral:true})
+                interaction.reply({content: `This user has already been muted, but a strike was still added. This student now has ${db.get(`${user.id}.strikes`)} strike(s)`, ephemeral:true})
                 return;
             }
             else{
