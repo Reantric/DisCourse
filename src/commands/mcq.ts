@@ -5,7 +5,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const marked: Discord.Collection<string,boolean> = new Discord.Collection();
 let msgToHold: Discord.Message;
 
-export default class add_q implements IBotInteraction {
+export default class mcq implements IBotInteraction {
     private readonly aliases = ["mcq"]
 
     name(): string {

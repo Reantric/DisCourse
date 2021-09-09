@@ -33,6 +33,7 @@ function randint(min: number,max: number) // min and max included
 const vals = {
     questions: [],
     points:0,
+    strikes:0
 }
 
 Bot.once("ready", () => {
