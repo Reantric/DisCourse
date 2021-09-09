@@ -59,6 +59,6 @@ export default class strike implements IBotInteraction {
         }
         console.log('struck')
         console.log(db.get(`${user.id}.strikes`))
-        interaction.reply({content: `You struck ${user}`, ephemeral:true});
+        interaction.reply({content: `You struck ${user}. This student now has ${db.get(`${user.id}.strikes`)} strike(s)`, ephemeral:true});
     }
 }
