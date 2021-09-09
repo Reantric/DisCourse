@@ -105,7 +105,7 @@ export default class attendance implements IBotInteraction {
             if (i.customId == 'attend'){
                 i.deferUpdate();
                 if (!allRoleUsers.has(interaction.member)){
-                    i.followUp("You aren't a student! Get out!");
+                    i.followUp({content: "You aren't a student! Get out!", ephemeral: true});
                 } else {
                 if (!marked.has(i.member!.user.id)){
                     i.followUp({content: `Marked you here!`, ephemeral:true});
