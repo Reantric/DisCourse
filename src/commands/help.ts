@@ -27,7 +27,7 @@ export default class help implements IBotInteraction {
     }
 
     async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
-        let embed = new Discord.MessageEmbed();
+        const embed = new Discord.MessageEmbed();
         if (interaction.member.roles.cache.some((role: { name: string; }) => role.name === 'Student')){
             embed.setTitle('DisCourse Command List')
             .setDescription('Here are a list of our student commands.')
@@ -57,6 +57,6 @@ export default class help implements IBotInteraction {
                 {name:"/mcq", value:"Create a multiple choice question that students can answer within a specified time and gives points if answered correctly"},
             );
         }
-    interaction.reply({embeds: [embed], ephemeral: true});  
+        await interaction.reply({embeds: [embed], ephemeral: true});  
 }
 }
