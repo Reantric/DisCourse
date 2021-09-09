@@ -35,6 +35,8 @@ const vals = {
     points:0,
 }
 
+let roleToId: Map<string,Map<string,string>> = new Map();
+
 Bot.once("ready", () => {
     console.log("This bot is online!"); //standard protocol when starting up the bot
     Bot.user!.setPresence({ activities: [{ name: 'educational videos.', type:'WATCHING' }], status: 'online' });
@@ -45,6 +47,12 @@ Bot.once("ready", () => {
             db.set(user.id,vals)
         }
     }); 
+
+    //Initialize the roleToId dictionary
+    Bot.guilds.cache.forEach((guild: Discord.Guild) => {
+
+     //   roleToId.set(guild.id,2);
+    })
 })
 
 Bot.on("guildMemberAdd", member => {

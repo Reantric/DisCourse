@@ -7,7 +7,9 @@ export function confidence(x: number, n: number) {
     let BOUND = 0.05;
     BOUND * Math.sqrt(n) / Math.sqrt(x)
 }
-//do i need that what does it even do
+//do i need that what does it even
+//when i wrote this code, only god and i knew how it worked
+//now only god knows it!
 function cTC(a: (number)[], b: (number)[]) {
     if (isNaN(a[1]))
         return 1;
