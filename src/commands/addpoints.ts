@@ -28,6 +28,7 @@ export default class addpoints implements IBotInteraction {
     .addIntegerOption((option:any) => 
         option.setName('points')
             .setDescription('How many points is this question worth?'));
+            
 }
 
 async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
