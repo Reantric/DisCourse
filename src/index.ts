@@ -44,7 +44,7 @@ Bot.once("ready", async () => {
     Bot.user!.setPresence({ activities: [{ name: 'educational videos.', type:'WATCHING' }], status: 'online' });
     Bot.user?.setUsername("DisCourse");
 
-    //Initialize the roleToId dictionary
+    
     await Bot.guilds.fetch();
     Bot.guilds.cache.forEach(async (guild: Discord.Guild) => {
         await guild.members.fetch();
@@ -53,10 +53,11 @@ Bot.once("ready", async () => {
                 db.set(user.id,vals)
             }
         })
+
+        //Initialize the roleToId dictionary
         var nameToID: Map<string,string> = new Map();
         //roleToId.set(guild.id,2);
     })
-    //console.log(db.all());
 })
 
 Bot.on("guildMemberAdd", member => {
