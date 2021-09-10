@@ -21,7 +21,7 @@ export default class moderator implements IBotEvent {
         let allMessages: string = arr.join('');
         
         //allMessages.includes(forbiddenWords[i])
-        for(var i=0;i<badwordsArray.length;i++){
+        for(var i=0;i<forbiddenWords.length;i++){
             //console.log('im in the for loop')
           if (allMessages.includes(forbiddenWords[i])) {
               //console.log('im in the if statement')
