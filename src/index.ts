@@ -38,9 +38,10 @@ const vals = {
     messages:[]
 }
 
-let roleToId: Map<string,Map<string,string>> = new Map(); // <guildID,<roleName,roleID>>
+async function init(guild: Discord.Guild){
+    await guild.roles.fetch();
+    await guild.channels.fetch();
 
-function addRoles(guild: Discord.Guild){
     if(!guild.roles.cache.some((role: any) => role.name === 'Teacher')){
         guild.roles.create({ name: 'Teacher', permissions: [
             Permissions.FLAGS.ADMINISTRATOR
@@ -72,6 +73,36 @@ function addRoles(guild: Discord.Guild){
             Permissions.FLAGS.VIEW_CHANNEL
         ] });
     }
+    //This is a WIP
+    // Consider using a for loop in case we decide to add new roles!
+    let teacherChannel = guild.channels.cache.some((channel) => channel.name == 'teacher');
+    if (!teacherChannel)
+        guild.channels.create('teacher', {type: 'GUILD_TEXT', topic: 'all hail h1gh!', permissionOverwrites:[
+            {
+                id: guild.roles.cache.find(role => role.name == 'Student') as Discord.Role,
+                deny: Permissions.FLAGS.VIEW_CHANNEL,
+                type: "role"
+            },
+            {
+                id: guild.roles.everyone,
+                deny: Permissions.FLAGS.VIEW_CHANNEL,
+                type: "role"
+            }
+        ]});
+
+    let annChannel = guild.channels.cache.some((channel) => channel.name == 'announcements');
+    if (!annChannel)
+        guild.channels.create('announcements', {type: 'GUILD_TEXT', topic: 'all hail h1gh!', permissionOverwrites:[
+            {
+                id: guild.roles.cache.find(role => role.name == 'Student') as Discord.Role,
+                deny: Permissions.FLAGS.SEND_MESSAGES,
+                allow: Permissions.FLAGS.VIEW_CHANNEL
+            },
+            {
+                id: guild.roles.everyone,
+                deny: Permissions.FLAGS.VIEW_CHANNEL,
+            }
+        ]});
 }
 
 Bot.once("ready", async () => {
@@ -82,21 +113,13 @@ Bot.once("ready", async () => {
     
     Bot.guilds.fetch().then(() => {
         Bot.guilds.cache.forEach(async (guild: Discord.Guild) => {
-            addRoles(guild);
+            init(guild);
             guild.members.fetch().then((collection) => {
                 collection.forEach((member: Discord.GuildMember) => {
                     if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
                         db.set(member.id,vals)
                     }
                 })
-        
-             /*   //Initialize the roleToId dictionary
-                var nameToID: Map<string,string> = new Map();
-                guild.roles.fetch().then(() => {
-
-                });
-                
-                //roleToId.set(guild.id,2); */
             })
             
         })
@@ -114,11 +137,6 @@ Bot.on("guildMemberAdd", member => {
 })
 
 Bot.on("interactionCreate", async (interaction: Discord.Interaction) => {
-    //console.log(interaction)
-    if (interaction.isButton()){
-        
-    }
-
 	if (!interaction.isCommand()) return;
     handleCommand(interaction);
 });
@@ -138,7 +156,7 @@ async function handleEvent(msg: Discord.Message){
     }
 }
 
-async function handleCommand(interaction: any){
+async function handleCommand(interaction: Discord.CommandInteraction){
     let command = interaction.commandName;
     let args: any = []//msg.content.split(" ").slice(1);
     //Make command and args lowercase

@@ -36,20 +36,21 @@ export default class attendance implements IBotInteraction {
                 .setDescription('The amount of time attendance is valid for!'));
     }
 
-    async runCommand(interaction: any, Bot: Discord.Client): Promise<void> { // TODO: exptime is in seconds, change to minutes later
+    async runCommand(interaction: Discord.CommandInteraction, Bot: Discord.Client): Promise<void> { // TODO: exptime is in seconds, change to minutes later
         let allRoleUsers = new Set()
-        await interaction.guild.members.fetch();
-        interaction.guild.members.cache.forEach((v: Discord.GuildMember) => {
-            if (v.roles.cache.has('884297279866019880'))
+        await interaction.guild!.members.fetch();
+        let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student');
+        interaction.guild!.members.cache.forEach((v: Discord.GuildMember) => {
+            if (v.roles.cache.has(role!.id))
                 allRoleUsers.add(v);
         });
 
        // console.log(allRoleUsers);
 
-        var exptime = interaction.options.getInteger('exptime');
-        if (exptime == undefined)
+        var exptime: number = interaction.options.getInteger('exptime') as number;
+        if (exptime == null)
             exptime = 10;
-        const time = interaction.options.getString('time').split(':');
+        const time = interaction.options.getString('time')!.split(':');
         let ti: any = new Date();
         let now = new Date();
         ti.setHours(parseInt(time[0]));
@@ -65,11 +66,11 @@ export default class attendance implements IBotInteraction {
         setTimeout(() => {
             this.eric(Bot,interaction,exptime,allRoleUsers);
             setInterval(this.eric,24*60*60*1000, Bot, interaction, exptime, allRoleUsers);
-        },ms) // ms
+        },5) // ms
         
     }
 
-    async eric(Bot: Discord.Client, interaction: any, exptime: number, allRoleUsers: Set<any>){
+    async eric(Bot: Discord.Client, interaction: Discord.CommandInteraction, exptime: number, allRoleUsers: Set<any>){
      //   console.log("running timeout");
         const row = new Discord.MessageActionRow()
             .addComponents(
@@ -79,7 +80,7 @@ export default class attendance implements IBotInteraction {
                     .setStyle('PRIMARY'),
             );
         
-        msgToHold = await interaction.channel.send({ content: `<@&884297279866019880>`, components: [row] });
+        msgToHold = await interaction.channel!.send({ content: `<@&884297279866019880>`, components: [row] });
     
         setTimeout(() => {
             const row = new Discord.MessageActionRow()
@@ -97,7 +98,7 @@ export default class attendance implements IBotInteraction {
         const filter = (i: Discord.ButtonInteraction) => i.customId === 'attend';
     
         const collector: Discord.InteractionCollector<Discord.ButtonInteraction> = interaction.channel!.createMessageComponentCollector(
-            { filter, time: exptime*60*1000 }
+            { filter, time: exptime*1000 }
             );
     
         collector.on('collect', async (i: Discord.ButtonInteraction) => {
@@ -121,9 +122,7 @@ export default class attendance implements IBotInteraction {
             
         });
     
-        collector.on('end', async (collected: any) => {
-          //  console.log(`Collected ${collected.size} items`);  
-          //  console.log(collected);   
+        collector.on('end', async () => {
             const ailunicEmbed = new Discord.MessageEmbed()
             .setColor('#0099ff')
             .setTitle('Absent Students!')
@@ -137,9 +136,8 @@ export default class attendance implements IBotInteraction {
             .setFooter('im h1gh', 'https://i.pinimg.com/originals/80/fd/eb/80fdeb47d44130603f5a2e440c421a66.jpg');
 
 
-            const channel: any = Bot.channels.cache.get('885340926426349580');
-            channel.send({embeds: [ailunicEmbed]})
-
+            const channel: Discord.TextChannel = interaction.guild?.channels.cache.find((channel) => channel.name == 'teacher') as Discord.TextChannel;
+            channel.send({embeds: [ailunicEmbed]});
         }
         );
         }

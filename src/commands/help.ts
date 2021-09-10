@@ -28,7 +28,7 @@ export default class help implements IBotInteraction {
 
     async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         let embed = new Discord.MessageEmbed();
-        if (interaction.member.roles.cache.some((role: { name: string; }) => role.name === 'Student')){
+        if (interaction.member!.roles?.cache.some((role: { name: string; }) => role.name === 'Student')){
             embed.setTitle('DisCourse Command List')
             .setDescription('Here are a list of our student commands.')
             .setColor('#5865F2')
