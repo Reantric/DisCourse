@@ -49,7 +49,7 @@ export default class attendance implements IBotInteraction {
             }
         });
 
-        console.log(allRoleUsers);
+        //console.log(allRoleUsers);
 
         var exptime: number = interaction.options.getInteger('exptime') as number;
         if (exptime == null)

@@ -152,6 +152,13 @@ Bot.on("messageCreate", msg => {
 })
 
 async function handleEvent(msg: Discord.Message){
+    let arr=db.get(`${msg.author.id}.messages`)
+    if (arr.length < 10){ // if not full
+        db.push(`${msg.author.id}.messages`,msg.content);
+    }
+    else {
+        db.set(`${msg.author.id}.messages`,[])
+    }
     for (const eventClass of events){
         await eventClass.runEvent(msg,Bot);
     }
