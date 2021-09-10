@@ -4,7 +4,7 @@ import * as db from "quick.db";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 
-export default class add_q implements IBotInteraction {
+export default class addq implements IBotInteraction {
     private readonly aliases = ["addq"]
 
     name(): string {

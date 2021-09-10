@@ -213,7 +213,6 @@ function loadCommands(commandsPath: string){
     let commandDatas: any[] = [];
     for (const commandName of Config.config.commands as string[]){ //turns commands in config.ts into a string array and iterates over them
         const commandsClass = require(`${commandsPath}/${commandName}`).default; //imports the command file (default=ts) from file directory
-
         const command = new commandsClass() as IBotInteraction; //command now follows same layout as IBotCommand in form commandsClass(), created new object
         commands.push(command); //adds commands to command array
         commandDatas.push(command.data().toJSON())

@@ -25,17 +25,23 @@ export default class addpoints implements IBotInteraction {
     return new SlashCommandBuilder()
     .setName(this.name())
     .setDescription(this.help())
+    .addUserOption((option: any) => option.setName('target').setDescription('Select a student to give points to.').setRequired(true))
     .addIntegerOption((option:any) => 
         option.setName('points')
-            .setDescription('How many points is this question worth?'));
-            
+            .setDescription('How many points is this question worth?')
+            .setRequired(true));
 }
 
 async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
+
+    if(!(interaction.member.roles.cache.some((role: { name: string; }) => role.name === 'Teacher'))){
+        interaction.reply({content: "Unfortunately, you cannot access this method because you do not have adminstrator privileges in the server.", ephemeral:true})
+        return;
+    }
     const int1 = interaction.options.getInteger('points')
-    console.log(int1)
-    db.add(`${interaction.member.user.id}.questions`,int1)
-    console.log(db.get(`${interaction.member.user.id}.questions`));
-    interaction.reply({content: `You added ${int1} point(s)`, ephemeral:true});
+    const user = interaction.options.getMember('target');//gets member
+    //console.log(int1)
+    db.add(`${user.id}.points`,int1)
+    interaction.reply({content: `You added ${int1} point(s) to ${user}.`, ephemeral:true});
 }
 }
