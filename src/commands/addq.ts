@@ -30,6 +30,9 @@ export default class addq implements IBotInteraction {
             .setName('server')
             .setDescription('Info about the server'));
 }
+perms(): "teacher" | "student" | "both" {
+    return 'teacher';
+ }
 
 async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     

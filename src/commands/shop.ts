@@ -26,6 +26,9 @@ export default class shop implements IBotInteraction {
         .setName(this.name())
         .setDescription(this.help())
     }
+    perms(): "teacher" | "student" | "both" {
+        return 'both';
+     }
 
     async runCommand(interaction: Discord.CommandInteraction, Bot: Discord.Client): Promise<void> {
         

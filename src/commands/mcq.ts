@@ -36,6 +36,9 @@ export default class mcq implements IBotInteraction {
         
         ;
     }
+    perms(): "teacher" | "student" | "both" {
+        return 'teacher';
+     }
 
 async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     //creates answer choices

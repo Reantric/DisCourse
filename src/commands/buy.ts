@@ -4,7 +4,7 @@ import * as db from "quick.db";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageSelectMenu, MessageEmbed } = require('discord.js');
 
-export default class checkstrikes implements IBotInteraction {
+export default class buy implements IBotInteraction {
 
     private readonly aliases = ["buy"]
 
@@ -28,6 +28,9 @@ export default class checkstrikes implements IBotInteraction {
         .setDescription(this.help())
         .addStringOption((option:any) => option.setName('role_name').setDescription('Enter a name for your custom role!'));
     }
+    perms(): "teacher" | "student" | "both" {
+        return 'both';
+     }
 
     async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         const role_name = interaction.options.getString('role_name');

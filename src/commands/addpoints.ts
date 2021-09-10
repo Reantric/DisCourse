@@ -31,6 +31,9 @@ export default class addpoints implements IBotInteraction {
             .setDescription('How many points is this question worth?')
             .setRequired(true));
 }
+perms(): "teacher" | "student" | "both" {
+    return 'teacher';
+ }
 
 async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
 

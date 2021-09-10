@@ -9,4 +9,5 @@ export interface IBotInteraction { //basically the blueprint for all interaction
     which all that really means is that it's expecting the data to be asynchronous; not orderly. Basically it'll be a lot more lenient with you ;D
     */
    data(): any // return data of slash command so json can be applied
+   perms(): 'teacher' | 'student' | 'both' // add sufficient perms!
 }
