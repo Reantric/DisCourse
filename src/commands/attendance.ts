@@ -64,13 +64,13 @@ export default class attendance implements IBotInteraction {
       //  console.log(ms);
         await interaction.reply({ephemeral: true, content:`Attendance will appear at ${time[0]}:${time[1]} and end at ${endTime.getHours()}:${endTime.getMinutes()}`});
         setTimeout(() => {
-            this.eric(Bot,interaction,exptime,allRoleUsers);
-            setInterval(this.eric,24*60*60*1000, Bot, interaction, exptime, allRoleUsers);
+            this.eric(Bot,interaction,exptime,allRoleUsers, role);
+            setInterval(this.eric,24*60*60*1000, Bot, interaction, exptime, allRoleUsers, role);
         },5) // ms
         
     }
 
-    async eric(Bot: Discord.Client, interaction: Discord.CommandInteraction, exptime: number, allRoleUsers: Set<any>){
+    async eric(Bot: Discord.Client, interaction: Discord.CommandInteraction, exptime: number, allRoleUsers: Set<any>, role: any){
      //   console.log("running timeout");
         const row = new Discord.MessageActionRow()
             .addComponents(
@@ -80,7 +80,7 @@ export default class attendance implements IBotInteraction {
                     .setStyle('PRIMARY'),
             );
         
-        msgToHold = await interaction.channel!.send({ content: `<@&884297279866019880>`, components: [row] });
+        msgToHold = await interaction.channel!.send({ content: `<@&${role.id}>`, components: [row] });
     
         setTimeout(() => {
             const row = new Discord.MessageActionRow()
@@ -91,7 +91,7 @@ export default class attendance implements IBotInteraction {
                     .setStyle('DANGER')
                     .setDisabled(true),
             );
-            msgToHold.edit({ content: `<@&884297279866019880>`, components: [row] });
+            msgToHold.edit({ content: `<&${role.id}`, components: [row] });
     
         },exptime*1000);
     
