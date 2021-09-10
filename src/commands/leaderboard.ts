@@ -3,10 +3,6 @@ import { IBotInteraction } from "../api/capi";
 import * as db from "quick.db";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
-export function confidence(x: number, n: number) {
-    let BOUND = 0.05;
-    BOUND * Math.sqrt(n) / Math.sqrt(x)
-}
 //do i need that what does it even
 //when i wrote this code, only god and i knew how it worked
 //now only god knows it!
@@ -49,7 +45,7 @@ export default class leaderboard implements IBotInteraction {
         .setDescription(this.help())
     }
 
-    async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
+    async runCommand(interaction: Discord.CommandInteraction, Bot: Discord.Client): Promise<void> {
 
         let userArray:any=[];
         let guildArray=interaction.guild!.members.cache.map((element: any)=>{
@@ -157,7 +153,7 @@ export default class leaderboard implements IBotInteraction {
                         initializer = `<:third_place:822887031143137321>`;
 
 
-                if (userArray[i][0] == interaction.member.user.id)
+                if (userArray[i][0] == interaction.member!.user.id)
                     embed.addFields(
                         { name:`${initializer} **#${(i+1)}: ${username}**`, value: `**${userArray[i][1]}**`},)
                  else
@@ -166,7 +162,7 @@ export default class leaderboard implements IBotInteraction {
         }
         
         embed.setTimestamp()
-        let ind = this.search(userArray,interaction.member.user.id);
+        let ind = this.search(userArray,interaction.member!.user.id);
         let initializer = "";
 
                 if(ind==0)
@@ -178,7 +174,7 @@ export default class leaderboard implements IBotInteraction {
         
                         
 
-        embed.addField(`${initializer} **#${ind+1}: ${interaction.member.user.username}**`,`**${Number(userArray[ind][1]).toFixed(2)}**`)
+        embed.addField(`${initializer} **#${ind+1}: ${interaction.member!.user.username}**`,`**${Number(userArray[ind][1]).toFixed(2)}**`)
         
 
         //interaction.channel.send(embed)

@@ -8,6 +8,7 @@ var qid = new db.table('id');
 const myIntents = new Discord.Intents();
 myIntents.add(Discord.Intents.FLAGS.GUILDS,Discord.Intents.FLAGS.GUILD_MEMBERS,Discord.Intents.FLAGS.GUILD_MESSAGES);
 const Bot: Discord.Client = new Discord.Client({intents: myIntents});
+import { Permissions } from 'discord.js';
 
 
 import fs = require('fs');
@@ -38,7 +39,72 @@ const vals = {
     messages:[]
 }
 
-let roleToId: Map<string,Map<string,string>> = new Map(); // <guildID,<roleName,roleID>>
+async function init(guild: Discord.Guild){
+    await guild.roles.fetch();
+    await guild.channels.fetch();
+
+    if(!guild.roles.cache.some((role: any) => role.name === 'Teacher')){
+        guild.roles.create({ name: 'Teacher', permissions: [
+            Permissions.FLAGS.ADMINISTRATOR
+        ] });
+    }
+    if(!guild.roles.cache.some((role: any) => role.name === 'Mute')){
+        guild.roles.create({ name: 'Mute', permissions: [
+            Permissions.FLAGS.READ_MESSAGE_HISTORY,
+            Permissions.FLAGS.VIEW_CHANNEL
+        ] });
+    }
+    if(!guild.roles.cache.some((role: any) => role.name === 'Student')){
+        guild.roles.create({ name: 'Student', permissions: [
+            Permissions.FLAGS.VIEW_CHANNEL,
+            Permissions.FLAGS.ADD_REACTIONS,
+            Permissions.FLAGS.STREAM,
+            Permissions.FLAGS.SEND_MESSAGES,
+            Permissions.FLAGS.EMBED_LINKS,
+            Permissions.FLAGS.ATTACH_FILES,
+            Permissions.FLAGS.READ_MESSAGE_HISTORY,
+            Permissions.FLAGS.CONNECT,
+            Permissions.FLAGS.SPEAK ,
+            Permissions.FLAGS.USE_PUBLIC_THREADS,
+        ] });
+    }
+    if(!guild.roles.cache.some((role: any) => role.name === 'Test')){
+        guild.roles.create({ name: 'Test', permissions: [
+            Permissions.FLAGS.READ_MESSAGE_HISTORY,
+            Permissions.FLAGS.VIEW_CHANNEL
+        ] });
+    }
+    //This is a WIP
+    // Consider using a for loop in case we decide to add new roles!
+    let teacherChannel = guild.channels.cache.some((channel) => channel.name == 'teacher');
+    if (!teacherChannel)
+        guild.channels.create('teacher', {type: 'GUILD_TEXT', topic: 'all hail h1gh!', permissionOverwrites:[
+            {
+                id: guild.roles.cache.find(role => role.name == 'Student') as Discord.Role,
+                deny: Permissions.FLAGS.VIEW_CHANNEL,
+                type: "role"
+            },
+            {
+                id: guild.roles.everyone,
+                deny: Permissions.FLAGS.VIEW_CHANNEL,
+                type: "role"
+            }
+        ]});
+
+    let annChannel = guild.channels.cache.some((channel) => channel.name == 'announcements');
+    if (!annChannel)
+        guild.channels.create('announcements', {type: 'GUILD_TEXT', topic: 'all hail h1gh!', permissionOverwrites:[
+            {
+                id: guild.roles.cache.find(role => role.name == 'Student') as Discord.Role,
+                deny: Permissions.FLAGS.SEND_MESSAGES,
+                allow: Permissions.FLAGS.VIEW_CHANNEL
+            },
+            {
+                id: guild.roles.everyone,
+                deny: Permissions.FLAGS.VIEW_CHANNEL,
+            }
+        ]});
+}
 
 Bot.once("ready", async () => {
     console.log("This bot is online!"); //standard protocol when starting up the bot
@@ -48,20 +114,13 @@ Bot.once("ready", async () => {
     
     Bot.guilds.fetch().then(() => {
         Bot.guilds.cache.forEach(async (guild: Discord.Guild) => {
-            guild.members.fetch().then(() => {
-                guild.members.cache.forEach((user: Discord.GuildMember) => {
-                    if (!db.has(user.id)){ //if User ID is not already in database (db) then add them, else do nothing
-                        db.set(user.id,vals)
+            init(guild);
+            guild.members.fetch().then((collection) => {
+                collection.forEach((member: Discord.GuildMember) => {
+                    if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
+                        db.set(member.id,vals)
                     }
                 })
-        
-             /*   //Initialize the roleToId dictionary
-                var nameToID: Map<string,string> = new Map();
-                guild.roles.fetch().then(() => {
-
-                });
-                
-                //roleToId.set(guild.id,2); */
             })
             
         })
@@ -74,16 +133,11 @@ Bot.on("guildMemberAdd", member => {
     db.set(member.id,vals)
    }
    console.log(member.user)
-   var role: any = member.guild.roles.cache.find(role => role.id == "822258289814536203");
-    member.roles.add(role);
+   var role: any = member.guild.roles.cache.find(role => role.name == "Student");
+   member.roles.add(role);
 })
 
 Bot.on("interactionCreate", async (interaction: Discord.Interaction) => {
-    //console.log(interaction)
-    if (interaction.isButton()){
-        
-    }
-
 	if (!interaction.isCommand()) return;
     handleCommand(interaction);
 });
@@ -103,7 +157,7 @@ async function handleEvent(msg: Discord.Message){
     }
 }
 
-async function handleCommand(interaction: any){
+async function handleCommand(interaction: Discord.CommandInteraction){
     let command = interaction.commandName;
     let args: any = []//msg.content.split(" ").slice(1);
     //Make command and args lowercase
