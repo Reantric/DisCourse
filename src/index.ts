@@ -132,8 +132,8 @@ Bot.on("guildMemberAdd", member => {
     db.set(member.id,vals)
    }
    console.log(member.user)
-   var role: any = member.guild.roles.cache.find(role => role.id == "822258289814536203");
-    member.roles.add(role);
+   var role: any = member.guild.roles.cache.find(role => role.name == "Student");
+   member.roles.add(role);
 })
 
 Bot.on("interactionCreate", async (interaction: Discord.Interaction) => {
