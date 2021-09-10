@@ -110,7 +110,7 @@ Bot.once("ready", async () => {
     console.log("This bot is online!"); //standard protocol when starting up the bot
     Bot.user!.setPresence({ activities: [{ name: 'educational videos.', type:'WATCHING' }], status: 'online' });
     Bot.user?.setUsername("DisCourse");
-
+    qid.set("id", 0);
     
     Bot.guilds.fetch().then(() => {
         Bot.guilds.cache.forEach(async (guild: Discord.Guild) => {

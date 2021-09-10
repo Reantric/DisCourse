@@ -1,6 +1,7 @@
 import * as Discord from "discord.js";
 import { IBotInteraction } from "../api/capi";
 import * as db from "quick.db";
+var qid = new db.table('id');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const marked: Discord.Collection<string,boolean> = new Discord.Collection();
 let msgToHold: Discord.Message;
@@ -60,8 +61,10 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     for (let i=0;i<answers.length;i++){
         answers![i].label = labels[i];
     }
+    var id = qid.get("id");
+    id = id.toString();
+    qid.set("id",qid.get("id")+1);
     //makes/sends the message
-    var id = "select"
     const row = new Discord.MessageActionRow()
         .addComponents(
             new Discord.MessageSelectMenu()
@@ -71,7 +74,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         );
     interaction.reply({content: "Creating your question...", ephemeral:true});
     msgToHold = await interaction.channel.send({ content: interaction.options.getString('question'), components: [row] });
-    
+    console.log(id);
     //changes message after
     setTimeout(() => {
         const row = new Discord.MessageActionRow()
