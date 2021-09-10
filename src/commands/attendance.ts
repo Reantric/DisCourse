@@ -1,4 +1,5 @@
 import * as Discord from "discord.js";
+import * as db from "quick.db";
 import { IBotInteraction } from "../api/capi";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
@@ -37,12 +38,15 @@ export default class attendance implements IBotInteraction {
     }
 
     async runCommand(interaction: Discord.CommandInteraction, Bot: Discord.Client): Promise<void> { // TODO: exptime is in seconds, change to minutes later
-        let allRoleUsers = new Set()
+        let allRoleUsers = new Set();
+        let copyRoleUsers = new Set();
         await interaction.guild!.members.fetch();
         let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student');
         interaction.guild!.members.cache.forEach((v: Discord.GuildMember) => {
-            if (v.roles.cache.has(role!.id))
+            if (v.roles.cache.has(role!.id)){
                 allRoleUsers.add(v);
+                copyRoleUsers.add(v);
+            }
         });
 
        // console.log(allRoleUsers);
@@ -62,15 +66,15 @@ export default class attendance implements IBotInteraction {
         }
         let endTime = new Date(ti.getTime() + exptime*60000);
       //  console.log(ms);
-        await interaction.reply({ephemeral: true, content:`Attendance will appear at ${time[0]}:${time[1]} and end at ${endTime.getHours()}:${endTime.getMinutes()}`});
+        await interaction.reply({ephemeral: true, content:`Attendance will appear at ${time[0].toString().padStart(2,"0")}:${time[1].toString().padStart(2,"0")} and end at ${endTime.getHours().toString().padStart(2,"0")}:${endTime.getMinutes().toString().padStart(2,"0")}`});
         setTimeout(() => {
-            this.eric(Bot,interaction,exptime,allRoleUsers, role);
-            setInterval(this.eric,24*60*60*1000, Bot, interaction, exptime, allRoleUsers, role);
-        },5) // ms
+            this.eric(Bot,interaction,exptime,allRoleUsers, role, copyRoleUsers);
+            setInterval(this.eric,24*60*60*1000, Bot, interaction, exptime, allRoleUsers, role, copyRoleUsers);
+        },ms) // ms
         
     }
 
-    async eric(Bot: Discord.Client, interaction: Discord.CommandInteraction, exptime: number, allRoleUsers: Set<any>, role: any){
+    async eric(Bot: Discord.Client, interaction: Discord.CommandInteraction, exptime: number, allRoleUsers: Set<any>, role: any, copyRoleUsers: Set<any>){
      //   console.log("running timeout");
         const row = new Discord.MessageActionRow()
             .addComponents(
@@ -91,16 +95,16 @@ export default class attendance implements IBotInteraction {
                     .setStyle('DANGER')
                     .setDisabled(true),
             );
-            msgToHold.edit({ content: `<&${role.id}`, components: [row] });
+            msgToHold.edit({ content: `<@&${role.id}>`, components: [row] });
     
-        },exptime*1000);
+        },exptime*60*1000);
     
         const filter = (i: Discord.ButtonInteraction) => i.customId === 'attend';
     
         const collector: Discord.InteractionCollector<Discord.ButtonInteraction> = interaction.channel!.createMessageComponentCollector(
-            { filter, time: exptime*1000 }
+            { filter, time: exptime*60*1000 }
             );
-    
+        
         collector.on('collect', async (i: Discord.ButtonInteraction) => {
             //console.log(marked);
             if (i.customId == 'attend'){
@@ -109,9 +113,10 @@ export default class attendance implements IBotInteraction {
                     i.followUp({content: "You aren't a student! Get out!", ephemeral: true});
                 } else {
                 if (!marked.has(i.member!.user.id)){
-                    i.followUp({content: `Marked you here!`, ephemeral:true});
+                    i.followUp({content: `Marked you here! You earned a point!`, ephemeral:true});
                     marked.set(i.member!.user.id,false);
-                    allRoleUsers.delete(i.member);
+                    copyRoleUsers.delete(i.member);
+                    db.set(`${i.member!.user.id}.points`,db.get(`${i.member!.user.id}.points`)+1);
                 }
                 else if (!marked.get(i.member!.user.id)){
                     i.followUp({content: `You have already been marked!`, ephemeral:true});
@@ -126,10 +131,10 @@ export default class attendance implements IBotInteraction {
             const ailunicEmbed = new Discord.MessageEmbed()
             .setColor('#0099ff')
             .setTitle('Absent Students!')
-            .setDescription('these suggas were h1gh and missed yo class!')
+            .setDescription('These people did not mark themselves present!')
             .setThumbnail('https://i.pinimg.com/originals/80/fd/eb/80fdeb47d44130603f5a2e440c421a66.jpg');
 
-            allRoleUsers.forEach((member: Discord.GuildMember) => {
+            copyRoleUsers.forEach((member: Discord.GuildMember) => {
                 ailunicEmbed.addField(`${member.displayName}#${member.user.discriminator}`, 'zooman alert: h1gh priority!');
             })
             ailunicEmbed.setTimestamp()

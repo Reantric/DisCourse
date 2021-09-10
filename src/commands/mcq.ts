@@ -5,7 +5,7 @@ var qid = new db.table('id');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const marked: Discord.Collection<string,boolean> = new Discord.Collection();
 let msgToHold: Discord.Message;
-//td: make this teacher-only, add points, add event listener
+//teacheronly
 export default class mcq implements IBotInteraction {
 
     name(): string {
@@ -118,9 +118,10 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
                 if(i.values[0]==="r"){    
                     const points = interaction.options.getInteger("points");
                     db.set(`${i.member!.user.id}.points`,db.get(`${i.member!.user.id}.points`)+points);
+                    i.followUp({content: 'You are correct!', ephemeral:true})
                 }
                 else{
-                    i.reply({content: 'Thank you for your response!', ephemeral:true})
+                    i.followUp({content: 'Sorry, your choice wasn\'t correct!', ephemeral:true})
                 }
             }
             else if (!answered.get(i.member!.user.id)){
