@@ -50,16 +50,25 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         if(interaction.options.get(arr[i]) != null){
             if(arr[i]==='right-answer'){
                 let obj = {label: i, description: interaction.options.getString(arr[i]),value: "r"};
-                let randIn = Math.floor(Math.random()*answers.length);
-                answers.splice(randIn, 0, obj);
+                answers.push(obj);
             }
             else{
                 let obj = {label: i, description: interaction.options.getString(arr[i]),value: `w${i.toString()}`};
-                let randIn = Math.floor(Math.random()*answers.length);
-                answers.splice(randIn, 0, obj);
+                answers.push(obj);
             }
         }
     }
+
+    const shuffleArray = (array:any) => {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = array[i];
+          array[i] = array[j];
+          array[j] = temp;
+        }
+      }
+    
+    shuffleArray(answers);
 
     for (let i=0;i<answers.length;i++){
         answers![i].label = labels[i];
@@ -96,7 +105,6 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     .setTimestamp();
 
     msgToHold = await interaction.channel.send({ embeds:[question],content: `<@&${role.id}>`, components: [row] });
-    console.log(id);
     //changes message after
     setTimeout(() => {
         const row = new Discord.MessageActionRow()
@@ -139,7 +147,6 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
             } else {
             if (!answered.has(i.member!.user.id)){
                 answered.set(i.member!.user.id,false);
-                console.log(i);
                 if(i.values[0]==="r"){    
                     const points = interaction.options.getInteger("points");
                     db.set(`${i.member!.user.id}.points`,db.get(`${i.member!.user.id}.points`)+points);
@@ -163,8 +170,6 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     });
 
     collector.on('end', collected => {
-        console.log(`Collected ${collected.size} items`);
-        console.log(collected);
         let answermap:any = {};
         let answerlist = "";
         for(let k = 0;k<answers.length;k++){
@@ -179,13 +184,16 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         }
         wrongAnswers = wrongAnswers.substring(0,wrongAnswers.length-2);
         let noresponders = "";
-        for(let j = 0; j<responses.length;j++){
+        for(let j = 0; j<collected.size;j++){
             let nickname = `${responses[allRoleUsers[j].user.id][0].displayName} #${responses[allRoleUsers[j].user.id][0].user.discriminator}`;
+            console.log(nickname);
             if(responses[allRoleUsers[j].user.id][1] === "r"){
                 correcters += `${nickname}\n`;
             }
             else{
+                console.log("cr0nge");
                 if(responses[allRoleUsers[j].user.id][1] === null){
+                    console.log("in null");
                     noresponders += `${nickname}\n`;
                 }
                 else{
@@ -203,22 +211,32 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
                             wrongers+=`${nickname}: ${answermap["w4"][0]}\n`;
                             break;
                         default:
-                          console.log(console.error("oh darn!"));
+                            console.log(console.error("oh darn!"));
+                            break;
                     }
                 }
             }
+        }
+        if(noresponders === ""){
+            noresponders = "Everybody responded!";
+        }
+        if(wrongers === ""){
+            wrongers = "Nobody got it wrong!";
+        }
+        if(correcters === ""){
+            correcters = "Nobody got it right!";
         }
         const embed = new Discord.MessageEmbed()
             .setColor('#0099ff')
             .setTitle('Multiple-Choice Question Summary')
             .setDescription('Here\'s what your students answered!')
             .addFields(
-                {name:interaction.options.getString("question"),value:answerlist},
-                {name:`Correct Answer: ${answermap["r"][0]}`, value:correcters},
-                {name:`Wrong Answers: ${wrongAnswers}`, value:wrongers},
-                {name:`Did Not Respond:`, value:noresponders}
+                {name:interaction.options.getString("question"),value: answerlist},
+                {name:`Correct Answer: ${answermap["r"][0]}`, value: correcters},
+                {name:`Wrong Answers: ${wrongAnswers}`, value: wrongers},
+                {name:`Did Not Respond:`, value: noresponders},
                 )
-            embed.setTimestamp()
+            .setTimestamp()
             .setFooter(`Question ID: ${id}`);
 
 
