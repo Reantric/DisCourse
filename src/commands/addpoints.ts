@@ -28,7 +28,7 @@ export default class addpoints implements IBotInteraction {
     .addUserOption((option: any) => option.setName('target').setDescription('Select a student to give points to.').setRequired(true))
     .addIntegerOption((option:any) => 
         option.setName('points')
-            .setDescription('How many points is this question worth?')
+            .setDescription('How many points are you giving?')
             .setRequired(true));
 }
 perms(): "teacher" | "student" | "both" {
@@ -36,11 +36,6 @@ perms(): "teacher" | "student" | "both" {
  }
 
 async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
-
-    if(!(interaction.member.roles.cache.some((role: { name: string; }) => role.name === 'Teacher'))){
-        interaction.reply({content: "Unfortunately, you cannot access this method because you do not have adminstrator privileges in the server.", ephemeral:true})
-        return;
-    }
     const int1 = interaction.options.getInteger('points')
     const user = interaction.options.getMember('target');//gets member
     //console.log(int1)

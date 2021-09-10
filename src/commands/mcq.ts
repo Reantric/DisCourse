@@ -91,7 +91,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     let time:Date = new Date();
     time.setHours(new Date().getHours()+interaction.options.getInteger('exptime'));
     question.addField( interaction.options.getString('question'), answerchoices)
-    .addField("Points: ", interaction.options.getInteger('points'))
+    .addField("Points: ", interaction.options.getInteger('points').toString())
     .setFooter(`This question must be completed by ${time.getHours().toString().padStart(2,"0")}:${time.getMinutes().toString().padStart(2,"0")}`)
     .setTimestamp();
 
@@ -109,7 +109,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         );
         msgToHold.edit({ content: "You can no longer answer this question.", components: [row] });
 
-    },interaction.options.getInteger("exptime")*60*60*1000);
+    },interaction.options.getInteger("exptime")*60*1000);
 
 
     //response collector
@@ -119,16 +119,14 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         fetchedMembers.forEach((v: Discord.GuildMember) => {
             if (v.roles.cache.some((role: { name: string; }) => role.name === 'Student')){
                 allRoleUsers.push(v);
-                responses[v.id]=null;
+                responses[v.id]=[v,null];
             }
         });
     })
-    console.log(allRoleUsers.length);
-    console.log(responses)
     const filter = (i: Discord.SelectMenuInteraction) => i.customId === id;
     const collector: Discord.InteractionCollector<Discord.SelectMenuInteraction> = 
         interaction.channel!.createMessageComponentCollector(
-            { filter, time: interaction.options.getInteger("exptime")*60*60*1000 }
+            { filter, time: interaction.options.getInteger("exptime")*60*1000 }
         );
 
 
@@ -147,14 +145,12 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
                     db.set(`${i.member!.user.id}.points`,db.get(`${i.member!.user.id}.points`)+points);
                     i.followUp({content: 'You are correct!', ephemeral:true});
                     let member = i.member!.user.id;
-                    responses[member]="r";
-                    console.log(responses);
+                    responses[member][1]="r";
                 }
                 else{
                     i.followUp({content: 'Sorry, your choice wasn\'t correct!', ephemeral:true});
                     let member = i.member!.user.id;
-                    responses[member]=i.values[0];
-                    console.log(responses);
+                    responses[member][1]=i.values[0];
                 }
             }
             else if (!answered.get(i.member!.user.id)){
@@ -169,10 +165,59 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     collector.on('end', collected => {
         console.log(`Collected ${collected.size} items`);
         console.log(collected);
+        let answermap:any = {};
+        let answerlist = "";
+        for(let k = 0;k<answers.length;k++){
+            answermap[answers[k].value] = [answers[k].label,answers[k].description];
+            answerlist += answermap[answers[k].value][0]+". " +answermap[answers[k].value][1]+"\n";
+        }
+        let correcters = "";
+        let wrongers = "";
+        let wrongAnswers = "";
+        for(let k = 1;k<answers.length;k++){
+            wrongAnswers += answermap[`w${k}`][0]+", ";
+        }
+        wrongAnswers = wrongAnswers.substring(0,wrongAnswers.length-2);
+        let noresponders = "";
+        for(let j = 0; j<responses.length;j++){
+            let nickname = `${responses[allRoleUsers[j].user.id][0].displayName} #${responses[allRoleUsers[j].user.id][0].user.discriminator}`;
+            if(responses[allRoleUsers[j].user.id][1] === "r"){
+                correcters += `${nickname}\n`;
+            }
+            else{
+                if(responses[allRoleUsers[j].user.id][1] === null){
+                    noresponders += `${nickname}\n`;
+                }
+                else{
+                    switch(responses[allRoleUsers[j].user.id][1]) {
+                        case "w1":
+                            wrongers+=`${nickname}: ${answermap["w1"][0]}\n`;
+                            break;
+                        case "w2":
+                            wrongers+=`${nickname}: ${answermap["w2"][0]}\n`;
+                            break;
+                        case "w3":
+                            wrongers+=`${nickname}: ${answermap["w3"][0]}\n`;
+                            break;
+                        case "w4":
+                            wrongers+=`${nickname}: ${answermap["w4"][0]}\n`;
+                            break;
+                        default:
+                          console.log(console.error("oh darn!"));
+                    }
+                }
+            }
+        }
         const embed = new Discord.MessageEmbed()
             .setColor('#0099ff')
             .setTitle('Multiple-Choice Question Summary')
             .setDescription('Here\'s what your students answered!')
+            .addFields(
+                {name:interaction.options.getString("question"),value:answerlist},
+                {name:`Correct Answer: ${answermap["r"][0]}`, value:correcters},
+                {name:`Wrong Answers: ${wrongAnswers}`, value:wrongers},
+                {name:`Did Not Respond:`, value:noresponders}
+                )
             embed.setTimestamp()
             .setFooter(`Question ID: ${id}`);
 
