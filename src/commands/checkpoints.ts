@@ -27,6 +27,9 @@ export default class checkpoints implements IBotInteraction {
         .setDescription(this.help())
         .addUserOption((option: any) => option.setName('target').setDescription('Select a student to check points for.').setRequired(true));
     }
+    perms(): "teacher" | "student" | "both" {
+        return 'teacher';
+     }
 
     async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         

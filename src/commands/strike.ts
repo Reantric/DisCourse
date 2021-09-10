@@ -27,6 +27,9 @@ export default class strike implements IBotInteraction {
         .setDescription(this.help())
         .addUserOption((option: any) => option.setName('target').setDescription('Select a student to strike').setRequired(true));
     }
+    perms(): "teacher" | "student" | "both" {
+        return 'teacher';
+     }
 
     async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         if(!(interaction.member.roles.cache.some((role: { name: string; }) => role.name === 'Teacher'))){

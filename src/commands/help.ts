@@ -25,6 +25,9 @@ export default class help implements IBotInteraction {
 		.setName(this.name())
 		.setDescription(this.help())
     }
+    perms(): "teacher" | "student" | "both" {
+        return 'both';
+     }
 
     async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         let embed = new Discord.MessageEmbed();

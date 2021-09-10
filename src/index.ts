@@ -18,11 +18,9 @@ import { Routes } from 'discord-api-types/v9';
 
 let commands: IBotInteraction[] = [];
 let events: IBotEvent[] = [];
-
-
-loadCommands(`${__dirname}/commands`)
-loadEvents(`${__dirname}/events`)
+    
 //get all commands from directory name (arbitrary) and load them into commands which is of type IBotCommand
+
 
 const cooldowns: any = new Discord.Collection();
 
@@ -39,9 +37,14 @@ const vals = {
     messages:[]
 }
 
+let allSlashCommands: Discord.Collection<Discord.Snowflake,Discord.ApplicationCommand>;
+let studentID: string;
+let teacherID: string;
+
 async function init(guild: Discord.Guild){
     await guild.roles.fetch();
     await guild.channels.fetch();
+    await Bot.application?.fetch();
 
     if(!guild.roles.cache.some((role: any) => role.name === 'Teacher')){
         guild.roles.create({ name: 'Teacher', permissions: [
@@ -74,13 +77,20 @@ async function init(guild: Discord.Guild){
             Permissions.FLAGS.VIEW_CHANNEL
         ] });
     }
+
+    studentID = guild.roles.cache.find(role => role.name == 'Student')?.id as string;
+    teacherID = guild.roles.cache.find(role => role.name == 'Teacher')?.id as string;
+    await Bot.guilds.cache.get('775700759869259776')?.commands.fetch().then((col: Discord.Collection<Discord.Snowflake,Discord.ApplicationCommand>) => {
+        loadCommands(`${__dirname}/commands`,col);
+        loadEvents(`${__dirname}/events`)
+    })
     //This is a WIP
     // Consider using a for loop in case we decide to add new roles!
     let teacherChannel = guild.channels.cache.some((channel) => channel.name == 'teacher');
     if (!teacherChannel)
         guild.channels.create('teacher', {type: 'GUILD_TEXT', topic: 'all hail h1gh!', permissionOverwrites:[
             {
-                id: guild.roles.cache.find(role => role.name == 'Student') as Discord.Role,
+                id: studentID,
                 deny: Permissions.FLAGS.VIEW_CHANNEL,
                 type: "role"
             },
@@ -95,7 +105,7 @@ async function init(guild: Discord.Guild){
     if (!annChannel)
         guild.channels.create('announcements', {type: 'GUILD_TEXT', topic: 'all hail h1gh!', permissionOverwrites:[
             {
-                id: guild.roles.cache.find(role => role.name == 'Student') as Discord.Role,
+                id: studentID,
                 deny: Permissions.FLAGS.SEND_MESSAGES,
                 allow: Permissions.FLAGS.VIEW_CHANNEL
             },
@@ -114,7 +124,7 @@ Bot.once("ready", async () => {
     
     Bot.guilds.fetch().then(() => {
         Bot.guilds.cache.forEach(async (guild: Discord.Guild) => {
-            init(guild);
+            await init(guild);
             guild.members.fetch().then((collection) => {
                 collection.forEach((member: Discord.GuildMember) => {
                     if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
@@ -207,7 +217,7 @@ async function handleCommand(interaction: Discord.CommandInteraction){
 } 
 
 
-function loadCommands(commandsPath: string){
+function loadCommands(commandsPath: string, allSlashCommands: Discord.Collection<Discord.Snowflake,Discord.ApplicationCommand>){
     if (!Config.config.commands || (Config.config.commands as string[]).length == 0) return; //goes into config.ts and reads the commands, checks if they are valid
     
     let commandDatas: any[] = [];
@@ -216,6 +226,31 @@ function loadCommands(commandsPath: string){
         const command = new commandsClass() as IBotInteraction; //command now follows same layout as IBotCommand in form commandsClass(), created new object
         commands.push(command); //adds commands to command array
         commandDatas.push(command.data().toJSON())
+        const permCommand = allSlashCommands.find((com) => com.name == command.name());
+        let xd: string;
+        switch (command.perms()){
+            case 'student':
+                xd = studentID
+                break;
+            case 'teacher':
+                xd = teacherID
+                break;
+            default:
+                xd = ''
+        }
+        //console.log(xd,command.name(), command.perms());
+        if (xd != ''){
+            const permissions: Discord.ApplicationCommandPermissionData[] = [
+                {
+                    id: xd,
+                    type: 'ROLE',
+                    permission: true,
+                },
+            ];
+
+            permCommand?.permissions.add({permissions});
+        }
+        
     }
 
     const rest: any = new REST({ version: '9' }).setToken(Config.config.token);
