@@ -4,6 +4,7 @@ var db = require('quick.db');
 import { IBotInteraction } from "./api/capi";
 import { IBotEvent } from "./api/eapi";
 var userBehavior = new db.table('user');
+var qid = new db.table('id');
 const myIntents = new Discord.Intents();
 myIntents.add(Discord.Intents.FLAGS.GUILDS,Discord.Intents.FLAGS.GUILD_MEMBERS,Discord.Intents.FLAGS.GUILD_MESSAGES);
 const Bot: Discord.Client = new Discord.Client({intents: myIntents});
