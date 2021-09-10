@@ -3,7 +3,6 @@ import { IBotInteraction } from "../api/capi";
 import * as db from "quick.db";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageSelectMenu, MessageEmbed, Permissions } = require('discord.js');
-let msgToHold: Discord.Message;
 
 export default class buy implements IBotInteraction {
 
@@ -76,17 +75,33 @@ export default class buy implements IBotInteraction {
                     ]),
             );
 
-        const embed = new MessageEmbed()
+        const embed: Discord.MessageEmbed = new Discord.MessageEmbed()
             .setColor('#0099ff')
-            .setTitle('Some title')
-            .setURL('https://discord.js.org/')
-            .setDescription('Some description here');
+            .setTitle('Shop')
+            .setDescription('A marketplace for special roles!')
+            .setThumbnail('https://cdn.discordapp.com/attachments/775700759869259779/885703618097983539/AKedOLQgG2F4XjLYwul4pevvcE9rrDtYeu-E7vHVl8Xf9gs900-c-k-c0x00ffffff-no-rj.png')
+            .setTimestamp()
+            .addFields(
+                { name: 'Nickname Control', value: '10 points', inline:true },
+                { name: 'Attaching Images & Files', value: '10 points', inline: true },
+                { name: 'External Emotes', value: '10 points', inline: true },
+                { name: 'Embed Links', value: '10 points', inline: true },
+                { name: 'Text-to-Speech', value: '100 points', inline: true },
+                { name: 'Administrative Permissions', value: '999999 points', inline: true }
+            )    ;   
         
         //console.log(interaction.fetchReply())
-        interaction.reply({content: "Shop for permissions!", ephemeral:true});
-         msgToHold= await interaction.channel.send({ content: 'Here are your choices:', ephemeral: true, embeds: [embed], components: [row] });
-        setTimeout(() => {
-            msgToHold.delete();
+         interaction.reply({ content: 'Here are your choices:', ephemeral: true, embeds: [embed], components: [row] });
+         setTimeout(() => {
+            const row = new Discord.MessageActionRow()
+            .addComponents(
+                new Discord.MessageButton()
+                    .setCustomId('ting')
+                    .setLabel(`Finished`)
+                    .setStyle('DANGER')
+                    .setDisabled(true),
+            );
+            interaction.editReply({ content: "The shop has expired.", components: [row] });
         },20*1000);
         
         

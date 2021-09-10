@@ -34,7 +34,8 @@ const vals = {
     questions: [],
     points:0,
     strikes:0,
-    messages:[]
+    messages:[],
+    absences:0
 }
 
 let studentID: string;
@@ -80,7 +81,7 @@ async function init(guild: Discord.Guild){
     studentID = guild.roles.cache.find(role => role.name == 'Student')?.id as string;
     teacherID = guild.roles.cache.find(role => role.name == 'Teacher')?.id as string;
     await Bot.guilds.cache.get('775700759869259776')?.commands.fetch().then((col: Discord.Collection<Discord.Snowflake,Discord.ApplicationCommand>) => {
-        loadCommands(`${__dirname}/commands`,new Discord.Collection())//col);
+        loadCommands(`${__dirname}/commands`,col);
         loadEvents(`${__dirname}/events`)
     })
     //This is a WIP
@@ -247,7 +248,7 @@ function loadCommands(commandsPath: string, allSlashCommands: Discord.Collection
                 },
             ];
 
-            //permCommand?.permissions.add({permissions});
+            permCommand?.permissions.add({permissions});
         }
         
     }
