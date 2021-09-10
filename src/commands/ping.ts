@@ -30,6 +30,9 @@ export default class ping implements IBotInteraction {
 			.setDescription('The input to echo back')
 			.setRequired(true));
     }
+    perms(): "teacher" | "student" | "both" {
+        return 'teacher';
+     }
 
     async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         const row = new Discord.MessageActionRow()

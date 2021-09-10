@@ -27,6 +27,9 @@ export default class checkstrikes implements IBotInteraction {
         .setDescription(this.help())
         .addUserOption((option: any) => option.setName('target').setDescription('Which student do you want to check strikes for?').setRequired(true));
     }
+    perms(): "teacher" | "student" | "both" {
+        return 'teacher';
+     }
 
     async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         

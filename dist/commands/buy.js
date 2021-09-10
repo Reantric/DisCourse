@@ -36,6 +36,9 @@ class checkstrikes {
             .addStringOption((option) => option.setName('role_name').setDescription('Enter a name for your custom role!').setRequired(true))
             .addStringOption((option) => option.setName('color').setDescription('Enter a solid color').setRequired(true));
     }
+    perms() {
+        return 'both';
+    }
     runCommand(interaction, Bot) {
         return __awaiter(this, void 0, void 0, function* () {
             const role_name = interaction.options.getString('role_name');
