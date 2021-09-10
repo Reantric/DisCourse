@@ -83,25 +83,17 @@ export default class buy implements IBotInteraction {
             .setDescription('Some description here');
         
         //console.log(interaction.fetchReply())
-        msgToHold= await interaction.reply({ content: 'Shop for Permissions!', ephemeral: true, embeds: [embed], components: [row] });
-        // setTimeout(() => {
-        //     const row = new Discord.MessageActionRow()
-        //     .addComponents(
-        //         new Discord.MessageButton()
-        //             .setCustomId('thing')
-        //             .setLabel(`Finished`)
-        //             .setStyle('DANGER')
-        //             .setDisabled(true),
-        //     );
-        //     msgToHold.edit({ content: "You can no longer answer this question.", components: [row] });
-    
-        // },60*1000);
+        interaction.reply({content: "Shop for permissions!", ephemeral:true});
+         msgToHold= await interaction.channel.send({ content: 'Here are your choices:', ephemeral: true, embeds: [embed], components: [row] });
+        setTimeout(() => {
+            msgToHold.delete();
+        },20*1000);
         
         
     const filter = (i: Discord.SelectMenuInteraction) => i.customId === 'shop';
     const collector: Discord.InteractionCollector<Discord.SelectMenuInteraction> = 
         interaction.channel!.createMessageComponentCollector(
-            { filter, time: 60*1000 }
+            { filter, time: 20*1000 }
         );
 
 
@@ -163,7 +155,7 @@ export default class buy implements IBotInteraction {
                     .then((role:any) => {
                         interaction.guild.roles.fetch(role.id)
                         interaction.member.roles.add([role])});
-                        i.followUp({content: `You can now use external emotes with the ${role_name} role.`, ephemeral:true})
+                    i.followUp({content: `You can now use external emotes with the ${role_name} role.`, ephemeral:true})
                 }
                 else{
                     i.followUp({content: 'This role name already exists!', ephemeral:true})
