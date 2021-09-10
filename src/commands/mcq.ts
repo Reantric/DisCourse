@@ -184,7 +184,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         }
         wrongAnswers = wrongAnswers.substring(0,wrongAnswers.length-2);
         let noresponders = "";
-        for(let j = 0; j<collected.size;j++){
+        for(let j = 0; j<Object.keys(responses).length;j++){
             let nickname = `${responses[allRoleUsers[j].user.id][0].displayName} #${responses[allRoleUsers[j].user.id][0].user.discriminator}`;
             console.log(nickname);
             if(responses[allRoleUsers[j].user.id][1] === "r"){
