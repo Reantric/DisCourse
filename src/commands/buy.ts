@@ -3,7 +3,6 @@ import { IBotInteraction } from "../api/capi";
 import * as db from "quick.db";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageSelectMenu, MessageEmbed, Permissions } = require('discord.js');
-let msgToHold: Discord.Message;
 
 export default class buy implements IBotInteraction {
 
@@ -83,10 +82,17 @@ export default class buy implements IBotInteraction {
             .setDescription('Some description here');
         
         //console.log(interaction.fetchReply())
-        interaction.reply({content: "Shop for permissions!", ephemeral:true});
-         msgToHold= await interaction.channel.send({ content: 'Here are your choices:', ephemeral: true, embeds: [embed], components: [row] });
-        setTimeout(() => {
-            msgToHold.delete();
+         interaction.reply({ content: 'Here are your choices:', ephemeral: true, embeds: [embed], components: [row] });
+         setTimeout(() => {
+            const row = new Discord.MessageActionRow()
+            .addComponents(
+                new Discord.MessageButton()
+                    .setCustomId('ting')
+                    .setLabel(`Finished`)
+                    .setStyle('DANGER')
+                    .setDisabled(true),
+            );
+            interaction.editReply({ content: "The shop has expired.", components: [row] });
         },20*1000);
         
         
