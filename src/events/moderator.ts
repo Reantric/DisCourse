@@ -23,12 +23,21 @@ export default class moderator implements IBotEvent {
         //allMessages.includes(forbiddenWords[i])
         for(var i=0;i<badwordsArray.length;i++){
             //console.log('im in the for loop')
-          if (allMessages.includes(badwordsArray[i])) {
+          if (allMessages.includes(forbiddenWords[i])) {
               //console.log('im in the if statement')
             //const mentionedUser = msg.mentions.users.first();
-            db.add(`${msg.author.id}.strikes`,1);
-            msg.reply(`${msg.author.username} now has ${db.get(`${msg.author.id}.strikes`)} strikes!`)
-            db.set(`${msg.author.id}.messages`, [])
+
+            if(msg.member!.roles.cache.some((role:any) => role.name === 'Student')){
+                  db.add(`${msg.author.id}.strikes`,1);
+                msg.reply({content:`${msg.author.username} now has ${db.get(`${msg.author.id}.strikes`)} strikes!`})
+                db.set(`${msg.author.id}.messages`, [])
+              }
+              else{
+                msg.reply(`You used a banned word, but you're off the hook because you're a teacher.`)
+              }
+            // db.add(`${msg.author.id}.strikes`,1);
+            // msg.reply(`${msg.author.username} now has ${db.get(`${msg.author.id}.strikes`)} strikes!`)
+            // db.set(`${msg.author.id}.messages`, [])
             
             break;
          }
@@ -40,7 +49,7 @@ export default class moderator implements IBotEvent {
             //console.log(msg.guild!.roles.cache.find(role => role.name == 'Mute'))
             if(msg.member!.roles.cache.some((role:any) => role.name === 'Student')){
                 msg.guild?.members.fetch(msg.author!.id).then(user=>{
-                user.roles.set([role]) // This removes all roles, so if a user has a role higher than the bot, API Error
+                user.roles.set([role])
             })
             }
             
@@ -51,3 +60,16 @@ export default class moderator implements IBotEvent {
 
     }
   }
+        //allMessages.includes(forbiddenWords[i])
+            //console.log('im in the for loop')
+              //console.log('im in the if statement')
+            //const mentionedUser = msg.mentions.users.first();
+          //   if(msg.member!.roles.cache.some((role:any) => role.name === 'Student')){
+          //     db.add(`${msg.author.id}.strikes`,1);
+              
+          //   msg.reply(`${msg.author.username} now has ${db.get(`${msg.author.id}.strikes`)} strikes!`)
+          //   db.set(`${msg.author.id}.messages`, [])
+          // }
+          // else{
+          //   msg.reply(`You used a banned word, but you're off the hook because you're a teacher.`)
+          // }
