@@ -113,9 +113,15 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
                 i.followUp({content: "Your answer was not saved as you are not a student.", ephemeral: true});
             } else {
             if (!answered.has(i.member!.user.id)){
-                i.followUp({content: 'Thank you for your response!', ephemeral:true});
                 answered.set(i.member!.user.id,false);
-                allRoleUsers.delete(i.member);
+                console.log(i);
+                if(i.values[0]==="r"){    
+                    const points = interaction.options.getInteger("points");
+                    db.set(`${i.member!.user.id}.points`,db.get(`${i.member!.user.id}.points`)+points);
+                }
+                else{
+                    i.reply({content: 'Thank you for your response!', ephemeral:true})
+                }
             }
             else if (!answered.get(i.member!.user.id)){
                 i.followUp({content: 'You have already responded to this question!', ephemeral:true});
