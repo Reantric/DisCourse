@@ -84,7 +84,7 @@ export default class attendance implements IBotInteraction {
                     .setStyle('PRIMARY'),
             );
         
-        msgToHold = await interaction.channel!.send({ content: `<@&${role.id}>`, components: [row] });
+        msgToHold = await interaction.channel!.send({ content: `Click here to mark yourself present! \n <@&${role.id}>`, components: [row] });
     
         setTimeout(() => {
             const row = new Discord.MessageActionRow()
@@ -95,7 +95,7 @@ export default class attendance implements IBotInteraction {
                     .setStyle('DANGER')
                     .setDisabled(true),
             );
-            msgToHold.edit({ content: `<@&${role.id}>`, components: [row] });
+            msgToHold.edit({ content: `You were too late! \n <@&${role.id}>`, components: [row] });
     
         },exptime*60*1000);
     

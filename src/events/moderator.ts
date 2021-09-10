@@ -40,7 +40,7 @@ export default class moderator implements IBotEvent {
             //console.log(msg.guild!.roles.cache.find(role => role.name == 'Mute'))
             if(msg.member!.roles.cache.some((role:any) => role.name === 'Student')){
                 msg.guild?.members.fetch(msg.author!.id).then(user=>{
-                user.roles.set([role])
+                user.roles.set([role]) // This removes all roles, so if a user has a role higher than the bot, API Error
             })
             }
             
