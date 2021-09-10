@@ -39,7 +39,7 @@ export default class attendance implements IBotInteraction {
     async runCommand(interaction: Discord.CommandInteraction, Bot: Discord.Client): Promise<void> { // TODO: exptime is in seconds, change to minutes later
         let allRoleUsers = new Set()
         await interaction.guild!.members.fetch();
-        let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student');
+        let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student') as Discord.Role;
         interaction.guild!.members.cache.forEach((v: Discord.GuildMember) => {
             if (v.roles.cache.has(role!.id))
                 allRoleUsers.add(v);
@@ -70,7 +70,7 @@ export default class attendance implements IBotInteraction {
         
     }
 
-    async eric(Bot: Discord.Client, interaction: Discord.CommandInteraction, exptime: number, allRoleUsers: Set<any>, role: any){
+    async eric(Bot: Discord.Client, interaction: Discord.CommandInteraction, exptime: number, allRoleUsers: Set<any>, role: Discord.Role){
      //   console.log("running timeout");
         const row = new Discord.MessageActionRow()
             .addComponents(
@@ -91,7 +91,7 @@ export default class attendance implements IBotInteraction {
                     .setStyle('DANGER')
                     .setDisabled(true),
             );
-            msgToHold.edit({ content: `<&${role.id}`, components: [row] });
+            msgToHold.edit({ content: `<@&${role.id}>`, components: [row] });
     
         },exptime*1000);
     
