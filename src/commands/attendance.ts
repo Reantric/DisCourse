@@ -41,7 +41,7 @@ export default class attendance implements IBotInteraction {
         let allRoleUsers = new Set();
         let copyRoleUsers = new Set();
         await interaction.guild!.members.fetch();
-        let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student');
+        let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student') as Discord.Role;
         interaction.guild!.members.cache.forEach((v: Discord.GuildMember) => {
             if (v.roles.cache.has(role!.id)){
                 allRoleUsers.add(v);

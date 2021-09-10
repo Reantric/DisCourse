@@ -138,10 +138,8 @@ export default class leaderboard implements IBotInteraction {
                     rounded = NaN;
                     userArray[i][1] = "N/A";
         }
-                 else {
-                    rounded =  Math.round(userArray[i][1]*2)/2;
-                    userArray[i][1] = userArray[i][1].toFixed(2);
-    }
+                 else 
+                    rounded =  userArray[i][1];
             
                 let initializer = "";
 
@@ -174,7 +172,7 @@ export default class leaderboard implements IBotInteraction {
         
                         
 
-        embed.addField(`${initializer} **#${ind+1}: ${interaction.member!.user.username}**`,`**${Number(userArray[ind][1]).toFixed(2)}**`)
+        embed.addField(`You → ${initializer} **#${ind+1}: ${interaction.member!.user.username}**`,`**${Number(userArray[ind][1])}**`)
         
 
         //interaction.channel.send(embed)
