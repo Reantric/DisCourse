@@ -118,7 +118,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         );
         msgToHold.edit({ content: "You can no longer answer this question.", components: [row] });
 
-    },interaction.options.getInteger("exptime")*60*60*1000);
+    },interaction.options.getInteger("exptime")*60*1000);//hours
 
 
     //response collector
@@ -135,7 +135,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     const filter = (i: Discord.SelectMenuInteraction) => i.customId === id;
     const collector: Discord.InteractionCollector<Discord.SelectMenuInteraction> = 
         interaction.channel!.createMessageComponentCollector(
-            { filter, time: interaction.options.getInteger("exptime")*60*60*1000 }
+            { filter, time: interaction.options.getInteger("exptime")*60*1000 }//hours
         );
 
 
