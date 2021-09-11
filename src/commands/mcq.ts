@@ -117,7 +117,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         );
         msgToHold.edit({ content: "You can no longer answer this question.", components: [row] });
 
-    },interaction.options.getInteger("exptime")*60*1000);
+    },interaction.options.getInteger("exptime")*60*60*1000);
 
 
     //response collector
@@ -134,7 +134,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     const filter = (i: Discord.SelectMenuInteraction) => i.customId === id;
     const collector: Discord.InteractionCollector<Discord.SelectMenuInteraction> = 
         interaction.channel!.createMessageComponentCollector(
-            { filter, time: interaction.options.getInteger("exptime")*60*1000 }
+            { filter, time: interaction.options.getInteger("exptime")*60*60*1000 }
         );
 
 
@@ -186,14 +186,14 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         let noresponders = "";
         for(let j = 0; j<Object.keys(responses).length;j++){
             let nickname = `${responses[allRoleUsers[j].user.id][0].displayName} #${responses[allRoleUsers[j].user.id][0].user.discriminator}`;
-            console.log(nickname);
+            //console.log(nickname);
             if(responses[allRoleUsers[j].user.id][1] === "r"){
                 correcters += `${nickname}\n`;
             }
             else{
-                console.log("cr0nge");
+                //console.log("cr0nge");
                 if(responses[allRoleUsers[j].user.id][1] === null){
-                    console.log("in null");
+                    //console.log("in null");
                     noresponders += `${nickname}\n`;
                 }
                 else{

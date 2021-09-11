@@ -1,40 +1,36 @@
 import * as Discord from "discord.js";
 import { IBotInteraction } from "../api/capi";
-import * as db from "quick.db";
 const { SlashCommandBuilder } = require('@discordjs/builders');
+import * as db from "quick.db";
+var qid = new db.table('id');
+var questioninfo = new db.table('qs');
 
-
-export default class addq implements IBotInteraction {
-    private readonly aliases = ["addq"]
+export default class replys implements IBotInteraction {
 
     name(): string {
-        return "addq";
+        return "replys";
     }
 
     help(): string {
-        return "addq";
+        return "replys";
     }   
     
     cooldown(): number{
         return 2;
     }
     isThisInteraction(command: string): boolean {
-        return this.aliases.includes(command);
+        return command === "replys";
     }
     data(): any {
     return new SlashCommandBuilder()
     .setName(this.name())
     .setDescription(this.help())
-    .addSubcommand((subcommand:any) =>
-            subcommand
-            .setName('server')
-            .setDescription('Info about the server'));
+    .addStringOption((option:any) => option.setName('question').setDescription('Enter your question (just the question):').setRequired(true))
 }
 perms(): "teacher" | "student" | "both" {
-    return 'teacher';
+    return 'student';
  }
 
 async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
-    
 }
 }

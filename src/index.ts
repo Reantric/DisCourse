@@ -228,15 +228,19 @@ function loadCommands(commandsPath: string, allSlashCommands: Discord.Collection
         commandDatas.push(command.data().toJSON())
         const permCommand = allSlashCommands.find((com) => com.name == command.name());
         let xd: string;
+        let complementxd: string;
         switch (command.perms()){
             case 'student':
                 xd = studentID
+                complementxd = teacherID;
                 break;
             case 'teacher':
                 xd = teacherID
+                complementxd = studentID;
                 break;
             default:
                 xd = ''
+                complementxd = ''
         }
         //console.log(xd,command.name(), command.perms());
         if (xd != ''){
@@ -246,11 +250,16 @@ function loadCommands(commandsPath: string, allSlashCommands: Discord.Collection
                     type: 'ROLE',
                     permission: true,
                 },
+                {
+                    id: complementxd,
+                    type: 'ROLE',
+                    permission: false,
+                },
             ];
 
             permCommand?.permissions.add({permissions});
+
         }
-        
     }
 
     const rest: any = new REST({ version: '9' }).setToken(Config.config.token);

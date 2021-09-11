@@ -38,9 +38,8 @@ export default class help implements IBotInteraction {
             .addFields(
                 {name:"/help", value:"Shows all available commands for that user"},
                 {name:"/leaderboard", value:"Shows the top 10 members with the most points in the class"},
-                {name:"/askq", value:"Ask a question that can be answered by other students or a teacher"},
+                {name:"/askquestion", value:"Ask a question that can be answered by other students or a teacher"},
                 {name:"/replys", value:"Reply to a question another student has asked"},
-                {name:"/answerq", value:"Answer an open-ended question a teacher has asked"},
             );
         }
         else if(interaction.member.roles.cache.some((role: { name: string; }) => role.name === 'Teacher')){
@@ -52,11 +51,8 @@ export default class help implements IBotInteraction {
                 {name:"/attendance", value:"Sends a message to all students so that they can mark that they are present; the message will disappear after a certain amount of time"},
                 {name:"/strike", value:"Mutes target user for certain amount of time and warns them with a custom message"},
                 {name:"/announcement", value:"Sends a message visible to all students in a channel"},
-                {name:"/replyt", value:"Reply to a question a student has asked"},
                 {name:"/changepoints", value:"Change the number of points a student has by adding or subtracting a certain amount"},
                 {name:"/leaderboard", value:"Shows the top 10 members with the most points in the class"},
-                {name:"/mcq", value:"Create a multiple choice question that students can answer within a specified time and gives points if answered correctly"},
-                {name:"/oeq", value:"Create an open-ended question that students can answer within a specified time and gives points if answered correctly"},
                 {name:"/mcq", value:"Create a multiple choice question that students can answer within a specified time and gives points if answered correctly"},
             );
         }
