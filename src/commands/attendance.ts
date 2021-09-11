@@ -110,7 +110,7 @@ export default class attendance implements IBotInteraction {
             //console.log(marked);
             if (i.customId == 'attend'){
                 i.deferUpdate();
-                if (!(interaction.member as Discord.GuildMember).roles.cache.has(role.id)){
+                if (!(i.member as Discord.GuildMember).roles.cache.has(role.id)){
                     i.followUp({content: "You aren't a student!", ephemeral: true});
                 } else {
                 if (!marked.has(i.member!.user.id)){
