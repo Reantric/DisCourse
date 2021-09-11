@@ -35,7 +35,7 @@ export default class profile implements IBotInteraction {
         const user = interaction.options.getUser('target');
         let embed = new Discord.MessageEmbed();
         if (interaction.member!.roles?.cache.some((role: { name: string; }) => role.name === 'Teacher')){
-            embed.setTitle(`${interaction.user.username}'s Profile`)
+            embed.setTitle(`${user.username}'s Profile`)
             .setDescription(`Here is your info!`)
             .setAuthor(user.username,user.avatarURL()!)
             .setColor('RANDOM')
