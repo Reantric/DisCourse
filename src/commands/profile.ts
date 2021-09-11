@@ -41,6 +41,7 @@ export default class profile implements IBotInteraction {
             .setColor('RANDOM')
             .addField(`Points`,`**${db.get(`${user.id}.points`)}**`,true)
             .addField(`Strikes`,`**${db.get(`${user.id}.strikes`)}**`,true)
+            .addField(`Absences`,`**${db.get(`${user.id}.absences`)}**`,true)
             .setThumbnail(user.avatarURL()!)
             .setTimestamp(new Date())
             .setFooter('DisCourse Profile');
@@ -53,6 +54,7 @@ export default class profile implements IBotInteraction {
             .setColor('RANDOM')
             .addField(`Points`,`**${db.get(`${interaction.user.id}.points`)}**`,true)
             .addField(`Strikes`,`**${db.get(`${interaction.user.id}.strikes`)}**`,true)
+            .addField(`Absences`,`**${db.get(`${user.id}.absences`)}**`,true)
             .setThumbnail(interaction.user.avatarURL()!)
             .setTimestamp(new Date())
             .setFooter('DisCourse Profile');        
