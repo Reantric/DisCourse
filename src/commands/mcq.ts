@@ -20,6 +20,7 @@ export default class mcq implements IBotInteraction {
     isThisInteraction(command: string): boolean {
         return command === "mcq";
     }
+
     data(): any {
         return new SlashCommandBuilder()
         .setName(this.name())
@@ -32,7 +33,6 @@ export default class mcq implements IBotInteraction {
         .addStringOption((option:any) => option.setName('wrong-answer2').setDescription('Wrong answer choice 2:').setRequired(false))
         .addStringOption((option:any) => option.setName('wrong-answer3').setDescription('Wrong answer choice 3:').setRequired(false))
         .addStringOption((option:any) => option.setName('wrong-answer4').setDescription('Wrong answer choice 4:').setRequired(false))
-        
         ;
     }
     perms(): "teacher" | "student" | "both" {

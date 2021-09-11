@@ -135,7 +135,7 @@ Bot.once("ready", async () => {
                     if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
                         db.set(member.id,vals)
                     }
-                    if (member.roles.cache.size == 0)
+                    if (!member.roles.cache.has(teacherID) || !member.roles.cache.has(studentID))
                         member.roles.add([h1gh as Discord.RoleResolvable]);
                 })
             })
