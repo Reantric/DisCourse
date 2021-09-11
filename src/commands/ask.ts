@@ -5,21 +5,21 @@ import * as db from "quick.db";
 var qid = new db.table('id');
 var questioninfo = new db.table('qs');
 
-export default class askquestion implements IBotInteraction {
+export default class ask implements IBotInteraction {
 
     name(): string {
-        return "askquestion";
+        return "ask";
     }
 
     help(): string {
-        return "askquestion";
+        return "ask";
     }   
     
     cooldown(): number{
         return 300;
     }
     isThisInteraction(command: string): boolean {
-        return command === "askquestion";
+        return command === "ask";
     }
     data(): any {
     return new SlashCommandBuilder()
