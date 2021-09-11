@@ -1,7 +1,7 @@
 import * as Discord from "discord.js";
 import { IBotInteraction } from "../api/capi";
 const { SlashCommandBuilder } = require('@discordjs/builders');
-
+import { helpUtil } from "..";
 
 export default class help implements IBotInteraction {
 
@@ -31,33 +31,14 @@ export default class help implements IBotInteraction {
 
     async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         let embed = new Discord.MessageEmbed();
-        if (interaction.member!.roles?.cache.some((role: { name: string; }) => role.name === 'Student')){
-            embed.setTitle('DisCourse Command List')
-            .setDescription('Here are a list of our student commands.')
-            .setColor('BLURPLE')
-            .addFields(
-                {name:"/help", value:"Shows all available commands for that user"},
-                {name:"/leaderboard", value:"Shows the top 10 members with the most points in the class"},
-                {name:"/ask", value:"Ask a question that can be answered by other students or a teacher"},
-                {name:"/answer", value:"Reply to a question another student has asked"},
-                {name:"/profile", value:"Check your own profile"},
-                {name:"/buy", value:"Buy items from the shop"},
-            );
-        }
-        else if(interaction.member.roles.cache.some((role: { name: string; }) => role.name === 'Teacher')){
-            embed.setTitle('DisCourse Command List')
-            .setDescription('Here are a list of our teacher commands.')
-            .setColor('BLURPLE')
-            .addFields(
-                {name:"/help", value:"Shows all available commands for that user"},
-                {name:"/attendance", value:"Sends a message to all students so that they can mark that they are present; the message will disappear after a certain amount of time"},
-                {name:"/strike", value:"Mutes target user for certain amount of time and warns them with a custom message"},
-                {name:"/announcement", value:"Sends a message visible to all students in a channel"},
-                {name:"/changepoints", value:"Change the number of points a student has by adding or subtracting a certain amount"},
-                {name:"/leaderboard", value:"Shows the top 10 members with the most points in the class"},
-                {name:"/mcq", value:"Create a multiple choice question that students can answer within a specified time and gives points if answered correctly"},
-            );
-        }
+        let isTeacher = interaction.member!.roles?.cache.some((role: { name: string; }) => role.name === 'Teacher');
+        embed.setTitle('DisCourse Command List')
+        .setDescription(`Here are a list of our ${isTeacher ? 'teacher' : 'student'} commands.`)
+        .setColor('BLURPLE');
+        helpUtil.get().forEach((helpPerm: string[],name: string) => {
+            if ((helpPerm[1] != 'student' && isTeacher) || (helpPerm[1] != 'teacher' && !isTeacher))
+                embed.addField(name,helpPerm[0]);
+        })
         await interaction.reply({embeds: [embed], ephemeral: true});  
-}
+    }   
 }

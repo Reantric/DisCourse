@@ -111,6 +111,10 @@ async function init(guild: Discord.Guild){
             {
                 id: teacherID,
                 allow: [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL]
+            },
+            {
+                id: guild.roles.everyone,
+                allow: Permissions.FLAGS.VIEW_CHANNEL,
             }
         ]});
 }
@@ -135,7 +139,6 @@ Bot.once("ready", async () => {
         })
     })
     })
-    
 
 Bot.on("guildMemberAdd", member => {
    if (!db.has(member.id)){ //if new member not in db, add them!
@@ -214,7 +217,23 @@ async function handleCommand(interaction: Discord.CommandInteraction){
         }  //if error, log it!
     }
 } 
+export class HelpUtil {
+    helpMap: Map<string,string[]>
+    
+    constructor(){
+        this.helpMap = new Map();
+    }
 
+    add(name: string,help: string,perms: "student" | "teacher" | "both"){
+        this.helpMap.set(name,[help,perms]);
+    }
+
+    get(){
+        return this.helpMap;
+    }
+}
+
+export const helpUtil = new HelpUtil();
 
 function loadCommands(commandsPath: string, allSlashCommands: Discord.Collection<Discord.Snowflake,Discord.ApplicationCommand>){
     if (!Config.config.commands || (Config.config.commands as string[]).length == 0) return; //goes into config.ts and reads the commands, checks if they are valid
@@ -223,6 +242,7 @@ function loadCommands(commandsPath: string, allSlashCommands: Discord.Collection
     for (const commandName of Config.config.commands as string[]){ //turns commands in config.ts into a string array and iterates over them
         const commandsClass = require(`${commandsPath}/${commandName}`).default; //imports the command file (default=ts) from file directory
         const command = new commandsClass() as IBotInteraction; //command now follows same layout as IBotCommand in form commandsClass(), created new object
+        helpUtil.add(command.name(),command.help(),command.perms());
         commands.push(command); //adds commands to command array
         commandDatas.push(command.data().toJSON())
         const permCommand = allSlashCommands.find((com) => com.name == command.name());
