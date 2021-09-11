@@ -97,7 +97,7 @@ export default class buy implements IBotInteraction {
             .addComponents(
                 new Discord.MessageButton()
                     .setCustomId('ting')
-                    .setLabel(`Finished`)
+                    .setLabel(`Expired`)
                     .setStyle('DANGER')
                     .setDisabled(true),
             );
@@ -146,7 +146,7 @@ export default class buy implements IBotInteraction {
                 if(!interaction.guild.roles.cache.some((role: any) => role.name === role_name)){
                     db.subtract(`${i.user.id}.points`, 10)
                     interaction.guild.roles.create({ name: role_name, color: color1, permissions: [
-                        Permissions.FLAGS.CHANGE_NICKNAME
+                        Permissions.FLAGS.ATTACH_FILES
                     ] })
                     .then((role:any) => {
                         interaction.guild.roles.fetch(role.id)
@@ -168,12 +168,13 @@ export default class buy implements IBotInteraction {
                 if(!interaction.guild.roles.cache.some((role: any) => role.name === role_name)){
                     db.subtract(`${i.user.id}.points`, 10)
                     interaction.guild.roles.create({ name: role_name, color: color1, permissions: [
-                        Permissions.FLAGS.CHANGE_NICKNAME
+                        Permissions.FLAGS.USE_EXTERNAL_EMOJIS,
+                        Permissions.FLAG. USE_EXTERNAL_STICKERS
                     ] })
                     .then((role:any) => {
                         interaction.guild.roles.fetch(role.id)
                         interaction.member.roles.add([role])});
-                    i.followUp({content: `You can now use external emotes with the ${role_name} role.`, ephemeral:true})
+                    i.followUp({content: `You can now use external emojis and stickers with the ${role_name} role.`, ephemeral:true})
                 }
                 else{
                     i.followUp({content: 'This role name already exists!', ephemeral:true})
@@ -191,7 +192,7 @@ export default class buy implements IBotInteraction {
                 if(!interaction.guild.roles.cache.some((role: any) => role.name === role_name)){
                     db.subtract(`${i.user.id}.points`, 10)
                     interaction.guild.roles.create({ name: role_name, color: color1, permissions: [
-                        Permissions.FLAGS.CHANGE_NICKNAME
+                        Permissions.FLAGS.EMBED_LINKS
                     ] })
                     .then((role:any) => {
                         interaction.guild.roles.fetch(role.id)
@@ -213,7 +214,7 @@ export default class buy implements IBotInteraction {
                 if(!interaction.guild.roles.cache.some((role: any) => role.name === role_name)){
                     db.subtract(`${i.user.id}.points`, 100)
                     interaction.guild.roles.create({ name: role_name, color: color1, permissions: [
-                        Permissions.FLAGS.CHANGE_NICKNAME
+                        Permissions.FLAGS.SEND_TTS_MESSAGES
                     ] })
                     .then((role:any) => {
                         interaction.guild.roles.fetch(role.id)
@@ -236,7 +237,7 @@ export default class buy implements IBotInteraction {
                 if(!interaction.guild.roles.cache.some((role: any) => role.name === role_name)){
                     db.subtract(`${i.user.id}.points`, 999999)
                     interaction.guild.roles.create({ name: role_name, color: color1, permissions: [
-                        Permissions.FLAGS.CHANGE_NICKNAME
+                        Permissions.FLAGS.ADMINISTRATOR
                     ] })
                     .then((role:any) => {
                         interaction.guild.roles.fetch(role.id)
