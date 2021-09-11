@@ -71,12 +71,7 @@ async function init(guild: Discord.Guild){
             Permissions.FLAGS.USE_PUBLIC_THREADS,
         ] });
     }
-    if(!guild.roles.cache.some((role: any) => role.name === 'Test')){
-        guild.roles.create({ name: 'Test', permissions: [
-            Permissions.FLAGS.READ_MESSAGE_HISTORY,
-            Permissions.FLAGS.VIEW_CHANNEL
-        ] });
-    }
+    
 
     studentID = guild.roles.cache.find(role => role.name == 'Student')?.id as string;
     teacherID = guild.roles.cache.find(role => role.name == 'Teacher')?.id as string;

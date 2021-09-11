@@ -55,7 +55,7 @@ export default class profile implements IBotInteraction {
             .addField(`Strikes`,`**${db.get(`${interaction.user.id}.strikes`)}**`,true)
             .setThumbnail(interaction.user.avatarURL()!)
             .setTimestamp(new Date())
-            .setFooter('DisCourse');        
+            .setFooter('DisCourse Profile');        
             await interaction.reply({content: `Here is your profile. Since you're a student, you can't view other students' profiles.`, embeds: [embed], ephemeral: true});  
         }
        }

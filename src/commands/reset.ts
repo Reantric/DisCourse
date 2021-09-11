@@ -38,7 +38,7 @@ export default class reset implements IBotInteraction {
         }
         const user = interaction.options.getMember('target');//gets member
         let role = user.guild.roles.cache.find((r:any) => r.name === "Student").id.toString();
-        console.log(role)
+        //console.log(role)
         if(user.roles.cache.some((role:any) => role.name === 'Teacher')){
             interaction.reply({content: "Teachers don't have strikes, silly. You reset nothing.", ephemeral:true})
             return;
@@ -47,7 +47,7 @@ export default class reset implements IBotInteraction {
             user.roles.set([role]);
         }
         db.set(`${user!.id}.strikes`,0);//reset student strikes
-        console.log(db.get(`${user.id}.strikes`))
+        //console.log(db.get(`${user.id}.strikes`))
         interaction.reply({content: `You reset ${user}'s strikes to 0.`, ephemeral:true});
     }
 }
