@@ -37,7 +37,7 @@ export default class help implements IBotInteraction {
         .setColor('BLURPLE');
         helpUtil.get().forEach((helpPerm: string[],name: string) => {
             if ((helpPerm[1] != 'student' && isTeacher) || (helpPerm[1] != 'teacher' && !isTeacher))
-                embed.addField(name,helpPerm[0]);
+                embed.addField('/'+name,helpPerm[0]);
         })
         await interaction.reply({embeds: [embed], ephemeral: true});  
     }   
