@@ -48,6 +48,7 @@ export default class strike implements IBotInteraction {
         }
         else{
             db.add(`${user!.id}.strikes`,1);//else strike student
+            db.set(`${user.id}.points`,Math.max(0,db.get(`${user.id}.points`)-2));
         }
 
         if(db.get(`${user.id}.strikes`)>=3){//if a student has at least three strikes then given the Mute role

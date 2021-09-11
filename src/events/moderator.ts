@@ -23,6 +23,7 @@ export default class moderator implements IBotEvent {
           if(allMessages.includes(forbiddenWords[i])){
             if(msg.member!.roles.cache.some((role:any) => role.name === 'Student')){
                   db.add(`${msg.author.id}.strikes`,1);
+                  db.set(`${msg.author.id}.points`,Math.max(0,db.get(`${msg.author.id}.points`)-2));
                   
                 msg.author.send(`Watch your mouth! You now have ${db.get(`${msg.author.id}.strikes`)} strike(s)! Reach 3 and you will be muted.`)
                 db.set(`${msg.author.id}.messages`, [])
