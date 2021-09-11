@@ -16,7 +16,7 @@ export default class ask implements IBotInteraction {
     }   
     
     cooldown(): number{
-        return 300;
+        return 600;
     }
     isThisInteraction(command: string): boolean {
         return command === "ask";
@@ -38,14 +38,16 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student') as Discord.Role;
     const question = new Discord.MessageEmbed();
     question.setTitle("Your classmate has a question!")
+    .setColor('#FEE75C')
     .setDescription(`Asked by: ${interaction.member.displayName} #${interaction.member.user.discriminator}`)
-    .addField(interaction.options.getString('question'),`Respond to this question using /replys with this question ID to have an opportunity to earn points!`)
+    .setThumbnail(interaction.member.user.avatarURL)
+    .addField(interaction.options.getString('question'),`Respond to this question using /answer with this question ID to have an opportunity to earn points!`)
     .setFooter(`Question ID: ${id}`)
     .setTimestamp();
     let msgid = "";
     interaction.channel.send({content:`<@&${role!.id}>`,embeds:[question]}).then((message:any) => {
         msgid = message.id;
-        console.log([msgid,interaction.member.user.id])
+        //console.log([msgid,interaction.member.user.id])
         questioninfo.set(id,[msgid,interaction.member.user.id]);
     }).catch((error:Error) => console.log(error));
     interaction.reply({content:`Your question was sent!`, ephemeral: true});

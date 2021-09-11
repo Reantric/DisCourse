@@ -88,7 +88,7 @@ async function init(guild: Discord.Guild){
     // Consider using a for loop in case we decide to add new roles!
     let teacherChannel = guild.channels.cache.some((channel) => channel.name == 'teacher');
     if (!teacherChannel)
-        guild.channels.create('teacher', {type: 'GUILD_TEXT', topic: 'all hail h1gh!', permissionOverwrites:[
+        guild.channels.create('teacher', {type: 'GUILD_TEXT', topic: 'Messages from you teacher will go here.', permissionOverwrites:[
             {
                 id: studentID,
                 deny: Permissions.FLAGS.VIEW_CHANNEL,

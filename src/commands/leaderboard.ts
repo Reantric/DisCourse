@@ -72,7 +72,7 @@ export default class leaderboard implements IBotInteraction {
         const embed = new Discord.MessageEmbed()
         .setTitle('Points Leaderboard!')
         
-        .setColor('#0099ff')
+        .setColor('AQUA')
         .setAuthor(Bot.user!.username, Bot.user!.avatarURL()!)
         //.setImage('https://i.redd.it/l28662sbcec51.png')
         .setThumbnail('https://i.imgur.com/aowYZQG.jpeg')

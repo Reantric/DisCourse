@@ -3,7 +3,6 @@ import { IBotInteraction } from "../api/capi";
 import * as db from "quick.db";
 var qid = new db.table('id');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-let msgToHold: Discord.Message;
 //teacheronly
 export default class mcq implements IBotInteraction {
 
@@ -41,6 +40,7 @@ export default class mcq implements IBotInteraction {
      }
 
 async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
+    let msgToHold: Discord.Message;
     //creates answer choices
     let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student') as Discord.Role;
     const arr = ['right-answer','wrong-answer1','wrong-answer2','wrong-answer3','wrong-answer4'];
@@ -88,6 +88,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     let question = new Discord.MessageEmbed();
     question.setTitle("Multiple-Choice Question")
     .setDescription("Students, please answer the following question your teacher has asked.")
+    .setColor('#ED4245');
     
     let answerchoices = 'Select one of the following answers:';
     for(let i=0;i<answers.length;i++){
@@ -227,7 +228,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
             correcters = "Nobody got it right!";
         }
         const embed = new Discord.MessageEmbed()
-            .setColor('#0099ff')
+            .setColor('#ED4245')
             .setTitle('Multiple-Choice Question Summary')
             .setDescription('Here\'s what your students answered!')
             .addFields(

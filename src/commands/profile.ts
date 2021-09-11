@@ -35,27 +35,27 @@ export default class profile implements IBotInteraction {
         const user = interaction.options.getUser('target');
         let embed = new Discord.MessageEmbed();
         if (interaction.member!.roles?.cache.some((role: { name: string; }) => role.name === 'Teacher')){
-            embed.setTitle('Profile!')
-            .setTitle(`${user.username}'s Profile`)
+            embed.setTitle(`${interaction.user.username}'s Profile`)
+            .setDescription(`Here is your info!`)
             .setAuthor(user.username,user.avatarURL()!)
             .setColor('#2cff00')
             .addField(`Points`,`**${db.get(`${user.id}.points`)}**`,true)
             .addField(`Strikes`,`**${db.get(`${user.id}.strikes`)}**`,true)
             .setThumbnail(user.avatarURL()!)
             .setTimestamp(new Date())
-            .setFooter('bruh h1gh Technologies', 'https://cdn.discordapp.com/attachments/819032675469361154/822502319147974666/lunges.png');
+            .setFooter('DisCourse Profile');
             await interaction.reply({content: `Here is ${user}'s profile`,embeds: [embed], ephemeral: true});  
         }
         else if(interaction.member.roles.cache.some((role: { name: string; }) => role.name === 'Student')){
-            embed.setTitle('Profile!')
-            .setTitle(`${interaction.user.username}'s Profile`)
+            embed.setTitle(`${interaction.user.username}'s Profile`)
+            .setDescription(`Here is your info!`)
             .setAuthor(interaction.user.username,interaction.user.avatarURL()!)
             .setColor('#2cff00')
             .addField(`Points`,`**${db.get(`${interaction.user.id}.points`)}**`,true)
             .addField(`Strikes`,`**${db.get(`${interaction.user.id}.strikes`)}**`,true)
             .setThumbnail(interaction.user.avatarURL()!)
             .setTimestamp(new Date())
-            .setFooter('bruh h1gh Technologies', 'https://cdn.discordapp.com/attachments/819032675469361154/822502319147974666/lunges.png');        
+            .setFooter('DisCourse');        
             await interaction.reply({content: `Here is your profile. Since you're a student, you can't view other students' profiles.`, embeds: [embed], ephemeral: true});  
         }
        }

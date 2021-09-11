@@ -3,9 +3,6 @@ import * as db from "quick.db";
 import { IBotInteraction } from "../api/capi";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
-const marked: Discord.Collection<string,boolean> = new Discord.Collection();
-let msgToHold: Discord.Message;
-
 export default class attendance implements IBotInteraction {
 
     name(): string {
@@ -78,6 +75,8 @@ export default class attendance implements IBotInteraction {
 
     async eric(Bot: Discord.Client, interaction: Discord.CommandInteraction, exptime: number, allRoleUsers: Set<Discord.GuildMember>, role: any){
      //   console.log("running timeout");
+        const marked: Discord.Collection<string,boolean> = new Discord.Collection();
+        let msgToHold: Discord.Message;
         const row = new Discord.MessageActionRow()
             .addComponents(
                 new Discord.MessageButton()
@@ -111,8 +110,8 @@ export default class attendance implements IBotInteraction {
             //console.log(marked);
             if (i.customId == 'attend'){
                 i.deferUpdate();
-                if (!(interaction.member as Discord.GuildMember).roles.cache.has(role.id)){
-                    i.followUp({content: "You aren't a student! Get out!", ephemeral: true});
+                if (!(i.member as Discord.GuildMember).roles.cache.has(role.id)){
+                    i.followUp({content: "You aren't a student!", ephemeral: true});
                 } else {
                 if (!marked.has(i.member!.user.id)){
                     i.followUp({content: `Marked you here! You earned a point!`, ephemeral:true});
@@ -141,7 +140,7 @@ export default class attendance implements IBotInteraction {
             });
 
             const ailunicEmbed = new Discord.MessageEmbed()
-            .setColor('#0099ff')
+            .setColor('#FFFFFF')
             .setTitle('Absent Students!')
             .setDescription('These people did not mark themselves present!')
             .setThumbnail('https://i.pinimg.com/originals/80/fd/eb/80fdeb47d44130603f5a2e440c421a66.jpg');
