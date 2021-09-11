@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Discord = require("discord.js");
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const __1 = require("..");
 class help {
     name() {
         return "help";
@@ -36,21 +37,17 @@ class help {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             let embed = new Discord.MessageEmbed();
-            if ((_a = interaction.member.roles) === null || _a === void 0 ? void 0 : _a.cache.some((role) => role.name === 'Student')) {
-                embed.setTitle('DisCourse Command List')
-                    .setDescription('Here are a list of our student commands.')
-                    .setColor('BLURPLE')
-                    .addFields({ name: "/help", value: "Shows all available commands for that user" }, { name: "/leaderboard", value: "Shows the top 10 members with the most points in the class" }, { name: "/ask", value: "Ask a question that can be answered by other students or a teacher" }, { name: "/answer", value: "Reply to a question another student has asked" }, { name: "/profile", value: "Check your own profile" }, { name: "/buy", value: "Buy items from the shop" });
-            }
-            else if (interaction.member.roles.cache.some((role) => role.name === 'Teacher')) {
-                embed.setTitle('DisCourse Command List')
-                    .setDescription('Here are a list of our teacher commands.')
-                    .setColor('BLURPLE')
-                    .addFields({ name: "/help", value: "Shows all available commands for that user" }, { name: "/attendance", value: "Sends a message to all students so that they can mark that they are present; the message will disappear after a certain amount of time" }, { name: "/strike", value: "Mutes target user for certain amount of time and warns them with a custom message" }, { name: "/announcement", value: "Sends a message visible to all students in a channel" }, { name: "/changepoints", value: "Change the number of points a student has by adding or subtracting a certain amount" }, { name: "/leaderboard", value: "Shows the top 10 members with the most points in the class" }, { name: "/mcq", value: "Create a multiple choice question that students can answer within a specified time and gives points if answered correctly" });
-            }
+            let isTeacher = (_a = interaction.member.roles) === null || _a === void 0 ? void 0 : _a.cache.some((role) => role.name === 'Teacher');
+            embed.setTitle('DisCourse Command List')
+                .setDescription(`Here are a list of our ${isTeacher ? 'teacher' : 'student'} commands.`)
+                .setColor('BLURPLE');
+            __1.helpUtil.get().forEach((helpPerm, name) => {
+                if ((helpPerm[1] != 'student' && isTeacher) || (helpPerm[1] != 'teacher' && !isTeacher))
+                    embed.addField(name, helpPerm[0]);
+            });
             yield interaction.reply({ embeds: [embed], ephemeral: true });
         });
     }
 }
 exports.default = help;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaGVscC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb21tYW5kcy9oZWxwLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7O0FBQUEsc0NBQXNDO0FBRXRDLE1BQU0sRUFBRSxtQkFBbUIsRUFBRSxHQUFHLE9BQU8sQ0FBQyxxQkFBcUIsQ0FBQyxDQUFDO0FBRy9ELE1BQXFCLElBQUk7SUFFckIsSUFBSTtRQUNBLE9BQU8sTUFBTSxDQUFDO0lBQ2xCLENBQUM7SUFFRCxJQUFJO1FBQ0EsT0FBTywrQ0FBK0MsQ0FBQztJQUMzRCxDQUFDO0lBRUQsUUFBUTtRQUNKLE9BQU8sQ0FBQyxDQUFDO0lBQ2IsQ0FBQztJQUNELGlCQUFpQixDQUFDLE9BQWU7UUFDN0IsT0FBTyxPQUFPLEtBQUssTUFBTSxDQUFDO0lBQzlCLENBQUM7SUFFRCxJQUFJO1FBQ0EsT0FBTyxJQUFJLG1CQUFtQixFQUFFO2FBQ3JDLE9BQU8sQ0FBQyxJQUFJLENBQUMsSUFBSSxFQUFFLENBQUM7YUFDcEIsY0FBYyxDQUFDLElBQUksQ0FBQyxJQUFJLEVBQUUsQ0FBQyxDQUFBO0lBQzFCLENBQUM7SUFDRCxLQUFLO1FBQ0QsT0FBTyxNQUFNLENBQUM7SUFDakIsQ0FBQztJQUVJLFVBQVUsQ0FBQyxXQUFnQixFQUFFLEdBQW1COzs7WUFDbEQsSUFBSSxLQUFLLEdBQUcsSUFBSSxPQUFPLENBQUMsWUFBWSxFQUFFLENBQUM7WUFDdkMsSUFBSSxNQUFBLFdBQVcsQ0FBQyxNQUFPLENBQUMsS0FBSywwQ0FBRSxLQUFLLENBQUMsSUFBSSxDQUFDLENBQUMsSUFBdUIsRUFBRSxFQUFFLENBQUMsSUFBSSxDQUFDLElBQUksS0FBSyxTQUFTLENBQUMsRUFBQztnQkFDNUYsS0FBSyxDQUFDLFFBQVEsQ0FBQyx3QkFBd0IsQ0FBQztxQkFDdkMsY0FBYyxDQUFDLDBDQUEwQyxDQUFDO3FCQUMxRCxRQUFRLENBQUMsU0FBUyxDQUFDO3FCQUNuQixTQUFTLENBQ04sRUFBQyxJQUFJLEVBQUMsT0FBTyxFQUFFLEtBQUssRUFBQyw0Q0FBNEMsRUFBQyxFQUNsRSxFQUFDLElBQUksRUFBQyxjQUFjLEVBQUUsS0FBSyxFQUFDLDREQUE0RCxFQUFDLEVBQ3pGLEVBQUMsSUFBSSxFQUFDLE1BQU0sRUFBRSxLQUFLLEVBQUMsb0VBQW9FLEVBQUMsRUFDekYsRUFBQyxJQUFJLEVBQUMsU0FBUyxFQUFFLEtBQUssRUFBQywrQ0FBK0MsRUFBQyxFQUN2RSxFQUFDLElBQUksRUFBQyxVQUFVLEVBQUUsS0FBSyxFQUFDLHdCQUF3QixFQUFDLEVBQ2pELEVBQUMsSUFBSSxFQUFDLE1BQU0sRUFBRSxLQUFLLEVBQUMseUJBQXlCLEVBQUMsQ0FDakQsQ0FBQzthQUNMO2lCQUNJLElBQUcsV0FBVyxDQUFDLE1BQU0sQ0FBQyxLQUFLLENBQUMsS0FBSyxDQUFDLElBQUksQ0FBQyxDQUFDLElBQXVCLEVBQUUsRUFBRSxDQUFDLElBQUksQ0FBQyxJQUFJLEtBQUssU0FBUyxDQUFDLEVBQUM7Z0JBQzlGLEtBQUssQ0FBQyxRQUFRLENBQUMsd0JBQXdCLENBQUM7cUJBQ3ZDLGNBQWMsQ0FBQywwQ0FBMEMsQ0FBQztxQkFDMUQsUUFBUSxDQUFDLFNBQVMsQ0FBQztxQkFDbkIsU0FBUyxDQUNOLEVBQUMsSUFBSSxFQUFDLE9BQU8sRUFBRSxLQUFLLEVBQUMsNENBQTRDLEVBQUMsRUFDbEUsRUFBQyxJQUFJLEVBQUMsYUFBYSxFQUFFLEtBQUssRUFBQyx3SUFBd0ksRUFBQyxFQUNwSyxFQUFDLElBQUksRUFBQyxTQUFTLEVBQUUsS0FBSyxFQUFDLG1GQUFtRixFQUFDLEVBQzNHLEVBQUMsSUFBSSxFQUFDLGVBQWUsRUFBRSxLQUFLLEVBQUMsc0RBQXNELEVBQUMsRUFDcEYsRUFBQyxJQUFJLEVBQUMsZUFBZSxFQUFFLEtBQUssRUFBQyxxRkFBcUYsRUFBQyxFQUNuSCxFQUFDLElBQUksRUFBQyxjQUFjLEVBQUUsS0FBSyxFQUFDLDREQUE0RCxFQUFDLEVBQ3pGLEVBQUMsSUFBSSxFQUFDLE1BQU0sRUFBRSxLQUFLLEVBQUMsMkhBQTJILEVBQUMsQ0FDbkosQ0FBQzthQUNMO1lBQ0QsTUFBTSxXQUFXLENBQUMsS0FBSyxDQUFDLEVBQUMsTUFBTSxFQUFFLENBQUMsS0FBSyxDQUFDLEVBQUUsU0FBUyxFQUFFLElBQUksRUFBQyxDQUFDLENBQUM7O0tBQ25FO0NBQ0E7QUF6REQsdUJBeURDIn0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaGVscC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb21tYW5kcy9oZWxwLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7O0FBQUEsc0NBQXNDO0FBRXRDLE1BQU0sRUFBRSxtQkFBbUIsRUFBRSxHQUFHLE9BQU8sQ0FBQyxxQkFBcUIsQ0FBQyxDQUFDO0FBQy9ELDBCQUE4QjtBQUU5QixNQUFxQixJQUFJO0lBRXJCLElBQUk7UUFDQSxPQUFPLE1BQU0sQ0FBQztJQUNsQixDQUFDO0lBRUQsSUFBSTtRQUNBLE9BQU8sK0NBQStDLENBQUM7SUFDM0QsQ0FBQztJQUVELFFBQVE7UUFDSixPQUFPLENBQUMsQ0FBQztJQUNiLENBQUM7SUFDRCxpQkFBaUIsQ0FBQyxPQUFlO1FBQzdCLE9BQU8sT0FBTyxLQUFLLE1BQU0sQ0FBQztJQUM5QixDQUFDO0lBRUQsSUFBSTtRQUNBLE9BQU8sSUFBSSxtQkFBbUIsRUFBRTthQUNyQyxPQUFPLENBQUMsSUFBSSxDQUFDLElBQUksRUFBRSxDQUFDO2FBQ3BCLGNBQWMsQ0FBQyxJQUFJLENBQUMsSUFBSSxFQUFFLENBQUMsQ0FBQTtJQUMxQixDQUFDO0lBQ0QsS0FBSztRQUNELE9BQU8sTUFBTSxDQUFDO0lBQ2pCLENBQUM7SUFFSSxVQUFVLENBQUMsV0FBZ0IsRUFBRSxHQUFtQjs7O1lBQ2xELElBQUksS0FBSyxHQUFHLElBQUksT0FBTyxDQUFDLFlBQVksRUFBRSxDQUFDO1lBQ3ZDLElBQUksU0FBUyxHQUFHLE1BQUEsV0FBVyxDQUFDLE1BQU8sQ0FBQyxLQUFLLDBDQUFFLEtBQUssQ0FBQyxJQUFJLENBQUMsQ0FBQyxJQUF1QixFQUFFLEVBQUUsQ0FBQyxJQUFJLENBQUMsSUFBSSxLQUFLLFNBQVMsQ0FBQyxDQUFDO1lBQzVHLEtBQUssQ0FBQyxRQUFRLENBQUMsd0JBQXdCLENBQUM7aUJBQ3ZDLGNBQWMsQ0FBQywwQkFBMEIsU0FBUyxDQUFDLENBQUMsQ0FBQyxTQUFTLENBQUMsQ0FBQyxDQUFDLFNBQVMsWUFBWSxDQUFDO2lCQUN2RixRQUFRLENBQUMsU0FBUyxDQUFDLENBQUM7WUFDckIsWUFBUSxDQUFDLEdBQUcsRUFBRSxDQUFDLE9BQU8sQ0FBQyxDQUFDLFFBQWtCLEVBQUMsSUFBWSxFQUFFLEVBQUU7Z0JBQ3ZELElBQUksQ0FBQyxRQUFRLENBQUMsQ0FBQyxDQUFDLElBQUksU0FBUyxJQUFJLFNBQVMsQ0FBQyxJQUFJLENBQUMsUUFBUSxDQUFDLENBQUMsQ0FBQyxJQUFJLFNBQVMsSUFBSSxDQUFDLFNBQVMsQ0FBQztvQkFDbkYsS0FBSyxDQUFDLFFBQVEsQ0FBQyxJQUFJLEVBQUMsUUFBUSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUM7WUFDekMsQ0FBQyxDQUFDLENBQUE7WUFDRixNQUFNLFdBQVcsQ0FBQyxLQUFLLENBQUMsRUFBQyxNQUFNLEVBQUUsQ0FBQyxLQUFLLENBQUMsRUFBRSxTQUFTLEVBQUUsSUFBSSxFQUFDLENBQUMsQ0FBQzs7S0FDbkU7Q0FDQTtBQXRDRCx1QkFzQ0MifQ==
