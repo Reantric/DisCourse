@@ -82,7 +82,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     const filter = (i: Discord.ButtonInteraction) => i.customId === `help${aid.toString()}`;
     
     const collector: Discord.InteractionCollector<Discord.ButtonInteraction> = interaction.channel!.createMessageComponentCollector(
-        { filter, time: 2*24*60*60*1000 } //2d
+        { filter, time: 20*1000 } //2d
         );
     let ptsEarned=0;
     setTimeout(() => {
@@ -96,7 +96,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         );
         msgToHold.edit({components: [row]});
 
-    },2*24*60*60*1000);//2d
+    },20*1000);//2d
 
     collector.on('collect', async (i: Discord.ButtonInteraction) => {
         //console.log(marked);
