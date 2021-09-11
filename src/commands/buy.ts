@@ -74,7 +74,6 @@ export default class buy implements IBotInteraction {
                         },
                     ]),
             );
-
         const embed: Discord.MessageEmbed = new Discord.MessageEmbed()
             .setColor('RANDOM')
             .setTitle('Shop')
