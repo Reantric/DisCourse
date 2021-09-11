@@ -93,7 +93,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     let answerchoices = 'Select one of the following answers:';
     for(let i=0;i<answers.length;i++){
         try{
-            answerchoices+=`\n${answers[i].label}. ${answers[i].description}`;
+            answerchoices+=`\n${answers[i].label}. ${answers[i].description}`; // change to addfield lataer
         }
         finally{
         }
@@ -106,21 +106,6 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     .setTimestamp();
 
     msgToHold = await interaction.channel.send({ embeds:[question],content: `<@&${role.id}>`, components: [row] });
-    //changes message after
-    setTimeout(() => {
-        const row = new Discord.MessageActionRow()
-        .addComponents(
-            new Discord.MessageButton()
-                .setCustomId(id)
-                .setLabel(`Finished`)
-                .setStyle('DANGER')
-                .setDisabled(true),
-        );
-        msgToHold.edit({ content: "You can no longer answer this question.", components: [row] });
-
-    },interaction.options.getInteger("exptime")*60*60*1000);
-
-
     //response collector
     let allRoleUsers:any[] = [];
     let responses:any={};
@@ -170,7 +155,18 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         
     });
 
-    collector.on('end', collected => {
+    collector.on('end', () => {
+        //changes message
+        const row = new Discord.MessageActionRow()
+        .addComponents(
+            new Discord.MessageButton()
+                .setCustomId(id)
+                .setLabel(`Finished`)
+                .setStyle('DANGER')
+                .setDisabled(true),
+        );
+        msgToHold.edit({ content: "You can no longer answer this question.", components: [row] });
+
         let answermap:any = {};
         let answerlist = "";
         for(let k = 0;k<answers.length;k++){
@@ -239,7 +235,6 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
                 )
             .setTimestamp()
             .setFooter(`Question ID: ${id}`);
-
 
             const channel: Discord.TextChannel = interaction.guild?.channels.cache.find((channel:any) => channel.name == 'teacher') as Discord.TextChannel;
             channel.send({embeds: [embed]});

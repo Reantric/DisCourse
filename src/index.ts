@@ -47,18 +47,12 @@ async function init(guild: Discord.Guild){
     await Bot.application?.fetch();
 
     if(!guild.roles.cache.some((role: any) => role.name === 'Teacher')){
-        guild.roles.create({ name: 'Teacher', permissions: [
+        await guild.roles.create({ name: 'Teacher', color: 'YELLOW',permissions: [
             Permissions.FLAGS.ADMINISTRATOR
         ] });
     }
-    if(!guild.roles.cache.some((role: any) => role.name === 'Mute')){
-        guild.roles.create({ name: 'Mute', permissions: [
-            Permissions.FLAGS.READ_MESSAGE_HISTORY,
-            Permissions.FLAGS.VIEW_CHANNEL
-        ] });
-    }
     if(!guild.roles.cache.some((role: any) => role.name === 'Student')){
-        guild.roles.create({ name: 'Student', permissions: [
+        await guild.roles.create({ name: 'Student',color: 'RED', permissions: [
             Permissions.FLAGS.VIEW_CHANNEL,
             Permissions.FLAGS.ADD_REACTIONS,
             Permissions.FLAGS.STREAM,
@@ -71,11 +65,18 @@ async function init(guild: Discord.Guild){
             Permissions.FLAGS.USE_PUBLIC_THREADS,
         ] });
     }
+
+    if(!guild.roles.cache.some((role: any) => role.name === 'Mute')){
+        await guild.roles.create({ name: 'Mute', color: 'GREEN', permissions: [
+            Permissions.FLAGS.READ_MESSAGE_HISTORY,
+            Permissions.FLAGS.VIEW_CHANNEL
+        ] });
+    }
     
 
     studentID = guild.roles.cache.find(role => role.name == 'Student')?.id as string;
     teacherID = guild.roles.cache.find(role => role.name == 'Teacher')?.id as string;
-    await Bot.guilds.cache.get('775700759869259776')?.commands.fetch().then((col: Discord.Collection<Discord.Snowflake,Discord.ApplicationCommand>) => {
+    await Bot.guilds.cache.get('886326356072337438')?.commands.fetch().then((col: Discord.Collection<Discord.Snowflake,Discord.ApplicationCommand>) => {
         loadCommands(`${__dirname}/commands`,col);
         loadEvents(`${__dirname}/events`)
     })
@@ -117,6 +118,7 @@ async function init(guild: Discord.Guild){
                 allow: Permissions.FLAGS.VIEW_CHANNEL,
             }
         ]});
+        return await guild.roles.fetch(teacherID);
 }
 
 Bot.once("ready", async () => {
@@ -127,12 +129,14 @@ Bot.once("ready", async () => {
     
     Bot.guilds.fetch().then(() => {
         Bot.guilds.cache.forEach(async (guild: Discord.Guild) => {
-            await init(guild);
+            let h1gh = await init(guild);
             guild.members.fetch().then((collection) => {
                 collection.forEach((member: Discord.GuildMember) => {
                     if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
                         db.set(member.id,vals)
                     }
+                    if (member.roles.cache.size == 0)
+                        member.roles.add([h1gh as Discord.RoleResolvable]);
                 })
             })
             
@@ -144,7 +148,6 @@ Bot.on("guildMemberAdd", member => {
    if (!db.has(member.id)){ //if new member not in db, add them!
     db.set(member.id,vals)
    }
-   console.log(member.user)
    var role: any = member.guild.roles.cache.find(role => role.name == "Student");
    member.roles.add(role);
 })

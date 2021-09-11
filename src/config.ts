@@ -8,6 +8,6 @@ export let config = {
     "commands": cfiles,
     "events": efiles,
     "clientID":"885542468693676054",
-    "guildID":"775700759869259776"
+    "guildID":"886326356072337438"
 }
 
