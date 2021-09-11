@@ -151,7 +151,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
                 if(i.values[0]==="r"){    
                     const points = interaction.options.getInteger("points");
                     db.set(`${i.member!.user.id}.points`,db.get(`${i.member!.user.id}.points`)+points);
-                    i.followUp({content: 'You are correct!', ephemeral:true});
+                    i.followUp({content: `You are correct! You received ${points} POINTS.`, ephemeral:true});
                     let member = i.member!.user.id;
                     responses[member][1]="r";
                 }
