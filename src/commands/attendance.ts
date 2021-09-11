@@ -69,7 +69,7 @@ export default class attendance implements IBotInteraction {
         setTimeout(() => {
             this.eric(Bot,interaction,exptime,allRoleUsers, role);
             setInterval(this.eric,24*60*60*1000, Bot, interaction, exptime, allRoleUsers, role);
-        },ms) // ms
+        },5) // ms
         
     }
 
@@ -86,24 +86,11 @@ export default class attendance implements IBotInteraction {
             );
         const channel: Discord.TextChannel = interaction.guild?.channels.cache.find((channel) => channel.name == 'announcements') as Discord.TextChannel;
         msgToHold = await channel.send({ content: `Click here to mark yourself present! \n <@&${role.id}>`, components: [row] });
-    
-        setTimeout(() => {
-            const row = new Discord.MessageActionRow()
-            .addComponents(
-                new Discord.MessageButton()
-                    .setCustomId('attend')
-                    .setLabel(`Expired`)
-                    .setStyle('DANGER')
-                    .setDisabled(true),
-            );
-            msgToHold.edit({ content: `You were too late! \n <@&${role.id}>`, components: [row] });
-    
-        },exptime*60*1000);
-    
+
         const filter = (i: Discord.ButtonInteraction) => i.customId === 'attend';
     
-        const collector: Discord.InteractionCollector<Discord.ButtonInteraction> = interaction.channel!.createMessageComponentCollector(
-            { filter, time: exptime*60*1000 }
+        const collector: Discord.InteractionCollector<Discord.ButtonInteraction> = channel.createMessageComponentCollector(
+            { filter, time: exptime*1000 }
             );
         
         collector.on('collect', async (i: Discord.ButtonInteraction) => {
@@ -139,17 +126,27 @@ export default class attendance implements IBotInteraction {
                 return 0;
             });
 
+            const row = new Discord.MessageActionRow()
+            .addComponents(
+                new Discord.MessageButton()
+                    .setCustomId('attend')
+                    .setLabel(`Expired`)
+                    .setStyle('DANGER')
+                    .setDisabled(true),
+            );
+            msgToHold.edit({ content: `You were too late! \n <@&${role.id}>`, components: [row] });
+
             const ailunicEmbed = new Discord.MessageEmbed()
             .setColor('#FFFFFF')
             .setTitle('Absent Students!')
             .setDescription('These people did not mark themselves present!')
-            .setThumbnail('https://i.pinimg.com/originals/80/fd/eb/80fdeb47d44130603f5a2e440c421a66.jpg');
+            .setThumbnail('https://c8.alamy.com/comp/2CCG33A/absent-sign-or-stamp-on-white-background-vector-illustration-2CCG33A.jpg');
 
             allRoleUsers.forEach((member: Discord.GuildMember) => {
                 ailunicEmbed.addField(`${member.displayName}#${member.user.discriminator}`, `${db.get(`${member.id}.absences`)} absence(s)`);
             })
             ailunicEmbed.setTimestamp()
-            .setFooter('Report!', `${Bot.user?.avatarURL}`);
+            .setFooter('DisCourse Report!');
 
 
             const channel: Discord.TextChannel = interaction.guild?.channels.cache.find((channel) => channel.name == 'teacher') as Discord.TextChannel;
