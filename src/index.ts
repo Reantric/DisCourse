@@ -98,7 +98,11 @@ async function init(guild: Discord.Guild){
                 id: guild.roles.everyone,
                 deny: Permissions.FLAGS.VIEW_CHANNEL,
                 type: "role"
-            }
+            },
+            {
+                id: teacherID,
+                allow: [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL]
+            },
         ]});
 
     let annChannel = guild.channels.cache.some((channel) => channel.name == 'announcements');
@@ -108,6 +112,10 @@ async function init(guild: Discord.Guild){
                 id: studentID,
                 deny: Permissions.FLAGS.SEND_MESSAGES,
                 allow: Permissions.FLAGS.VIEW_CHANNEL
+            },
+            {
+                id: teacherID,
+                allow: [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL]
             },
             {
                 id: guild.roles.everyone,

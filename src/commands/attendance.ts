@@ -42,7 +42,7 @@ export default class attendance implements IBotInteraction {
     }
 
     async runCommand(interaction: Discord.CommandInteraction, Bot: Discord.Client): Promise<void> { // TODO: exptime is in seconds, change to minutes later
-        let allRoleUsers = new Set();
+        let allRoleUsers: Set<Discord.GuildMember> = new Set();
         await interaction.guild!.members.fetch();
         let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student') as Discord.Role;
         interaction.guild!.members.cache.forEach((v: Discord.GuildMember) => {
@@ -76,7 +76,7 @@ export default class attendance implements IBotInteraction {
         
     }
 
-    async eric(Bot: Discord.Client, interaction: Discord.CommandInteraction, exptime: number, allRoleUsers: Set<any>, role: any){
+    async eric(Bot: Discord.Client, interaction: Discord.CommandInteraction, exptime: number, allRoleUsers: Set<Discord.GuildMember>, role: any){
      //   console.log("running timeout");
         const row = new Discord.MessageActionRow()
             .addComponents(
@@ -111,13 +111,13 @@ export default class attendance implements IBotInteraction {
             //console.log(marked);
             if (i.customId == 'attend'){
                 i.deferUpdate();
-                if ((interaction.member as Discord.GuildMember).roles.cache.has(role.id)){
+                if (!(interaction.member as Discord.GuildMember).roles.cache.has(role.id)){
                     i.followUp({content: "You aren't a student! Get out!", ephemeral: true});
                 } else {
                 if (!marked.has(i.member!.user.id)){
                     i.followUp({content: `Marked you here! You earned a point!`, ephemeral:true});
                     marked.set(i.member!.user.id,false);
-                    allRoleUsers.delete(i.member);
+                    allRoleUsers.delete(i.member as Discord.GuildMember);
                     db.set(`${i.member!.user.id}.points`,db.get(`${i.member!.user.id}.points`)+1);
                 }
                 else if (!marked.get(i.member!.user.id)){
@@ -130,6 +130,16 @@ export default class attendance implements IBotInteraction {
         });
     
         collector.on('end', async () => {
+            Array.from(allRoleUsers).sort((a,b) => {
+                const aAb = db.get(`${a.id}.absences`);
+                const bAb = db.get(`${b.id}.absences`);
+                if (aAb > bAb)
+                    return 1
+                else if (bAb > aAb)
+                    return -1
+                return 0;
+            });
+
             const ailunicEmbed = new Discord.MessageEmbed()
             .setColor('#0099ff')
             .setTitle('Absent Students!')
@@ -137,7 +147,7 @@ export default class attendance implements IBotInteraction {
             .setThumbnail('https://i.pinimg.com/originals/80/fd/eb/80fdeb47d44130603f5a2e440c421a66.jpg');
 
             allRoleUsers.forEach((member: Discord.GuildMember) => {
-                ailunicEmbed.addField(`${member.displayName}#${member.user.discriminator}`, `${db.get(`${member.id}.absences`)} ABsc`);
+                ailunicEmbed.addField(`${member.displayName}#${member.user.discriminator}`, `${db.get(`${member.id}.absences`)} absence(s)`);
             })
             ailunicEmbed.setTimestamp()
             .setFooter('Report!', 'https://i.pinimg.com/originals/80/fd/eb/80fdeb47d44130603f5a2e440c421a66.jpg');

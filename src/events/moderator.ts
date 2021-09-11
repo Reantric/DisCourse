@@ -34,6 +34,7 @@ export default class moderator implements IBotEvent {
               }
               else{
                 msg.reply(`You used a banned word, but you're off the hook because you're a teacher.`)
+                db.set(`${msg.author.id}.messages`, [])
               }
             // db.add(`${msg.author.id}.strikes`,1);
             // msg.reply(`${msg.author.username} now has ${db.get(`${msg.author.id}.strikes`)} strikes!`)
@@ -45,13 +46,20 @@ export default class moderator implements IBotEvent {
         }
         let strikeAmount = db.get(`${msg.author!.id}.strikes`);
           if(strikeAmount>=3){
+            try {
             var role: any = msg.guild!.roles.cache.find(role => role.name == 'Mute');
             //console.log(msg.guild!.roles.cache.find(role => role.name == 'Mute'))
             if(msg.member!.roles.cache.some((role:any) => role.name === 'Student')){
                 msg.guild?.members.fetch(msg.author!.id).then(user=>{
-                user.roles.set([role])
+                  if (!user.roles.cache.find(role => (role.name == 'Teacher' || role.name == 'Admin')))
+                     user.roles.set([role])
             })
             }
+          } catch (error){
+           // msg.channel.send("aaron i hate your code so much");
+            console.error(error);
+            db.set(`${msg.author.id}.messages`, [])
+          }
             
           }
                 
