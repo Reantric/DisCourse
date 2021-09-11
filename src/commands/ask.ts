@@ -12,7 +12,7 @@ export default class ask implements IBotInteraction {
     }
 
     help(): string {
-        return "ask";
+        return "Students can ask their own questions! Answering this will award points if the student asking finds a response helpful.";
     }   
     
     cooldown(): number{

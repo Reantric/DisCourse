@@ -13,8 +13,8 @@ export default class buy implements IBotInteraction {
     } 
 
     help(): string {
-        return "buy";
-    }   
+        return "Buy new server permissions with custom role names!";
+    }
     
     cooldown(): number{
         return 2;

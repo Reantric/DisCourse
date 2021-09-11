@@ -12,7 +12,7 @@ export default class addpoints implements IBotInteraction {
     }
 
     help(): string {
-        return "addpoints";
+        return "Manually award points to any student.";
     }   
     
     cooldown(): number{

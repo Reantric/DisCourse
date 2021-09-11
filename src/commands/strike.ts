@@ -12,7 +12,7 @@ export default class strike implements IBotInteraction {
     } 
 
     help(): string {
-        return "strike";
+        return "Manually strike a student for inappropriate behavior.";
     }   
     
     cooldown(): number{
