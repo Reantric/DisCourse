@@ -10,7 +10,7 @@ export default class help implements IBotInteraction {
     } 
 
     help(): string {
-        return "Gives a list of all commands available to you";
+        return "A list of all commands available to you.";
     }   
     
     cooldown(): number{

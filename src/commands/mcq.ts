@@ -11,7 +11,7 @@ export default class mcq implements IBotInteraction {
     }
 
     help(): string {
-        return "Make a multiple-choice question for your students";
+        return "Make a multiple-choice question for your students.";
     }   
     
     cooldown(): number{

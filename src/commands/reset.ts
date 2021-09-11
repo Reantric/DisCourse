@@ -12,7 +12,7 @@ export default class reset implements IBotInteraction {
     } 
 
     help(): string {
-        return "reset";
+        return "Reset a student's strikes and give them a Student role. Use if a student is Muted/";
     }   
     
     cooldown(): number{

@@ -12,7 +12,7 @@ export default class answer implements IBotInteraction {
     }
 
     help(): string {
-        return "answer";
+        return "Answer another student's question using the respective question ID.";
     }   
     
     cooldown(): number{

@@ -30,7 +30,7 @@ export default class leaderboard implements IBotInteraction {
     } 
 
     help(): string {
-        return "leaderboard";
+        return "A points leaderboard!";
     }   
     
     cooldown(): number{

@@ -11,7 +11,7 @@ export default class profile implements IBotInteraction {
     } 
 
     help(): string {
-        return "View any student's profile! You can only view your own profile if you\'re a student";
+        return "View any student's profile! You can only view your own profile if you\'re a student.";
     }   
     
     cooldown(): number{
