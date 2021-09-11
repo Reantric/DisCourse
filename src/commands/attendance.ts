@@ -69,7 +69,7 @@ export default class attendance implements IBotInteraction {
         setTimeout(() => {
             this.eric(Bot,interaction,exptime,allRoleUsers, role);
             setInterval(this.eric,24*60*60*1000, Bot, interaction, exptime, allRoleUsers, role);
-        },5) // ms
+        },ms) // ms
         
     }
 
@@ -140,9 +140,10 @@ export default class attendance implements IBotInteraction {
             .setColor('#FFFFFF')
             .setTitle('Absent Students!')
             .setDescription('These people did not mark themselves present!')
-            .setThumbnail('https://c8.alamy.com/comp/2CCG33A/absent-sign-or-stamp-on-white-background-vector-illustration-2CCG33A.jpg');
+            .setThumbnail('https://images.pexels.com/photos/963486/pexels-photo-963486.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940');
 
             allRoleUsers.forEach((member: Discord.GuildMember) => {
+                db.add(`${member.id}.absences`,1);
                 ailunicEmbed.addField(`${member.displayName}#${member.user.discriminator}`, `${db.get(`${member.id}.absences`)} absence(s)`);
             })
             ailunicEmbed.setTimestamp()
