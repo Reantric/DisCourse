@@ -84,8 +84,8 @@ export default class attendance implements IBotInteraction {
                     .setLabel(`I'm here!`)
                     .setStyle('PRIMARY'),
             );
-        
-        msgToHold = await interaction.channel!.send({ content: `Click here to mark yourself present! \n <@&${role.id}>`, components: [row] });
+        const channel: Discord.TextChannel = interaction.guild?.channels.cache.find((channel) => channel.name == 'announcements') as Discord.TextChannel;
+        msgToHold = await channel.send({ content: `Click here to mark yourself present! \n <@&${role.id}>`, components: [row] });
     
         setTimeout(() => {
             const row = new Discord.MessageActionRow()

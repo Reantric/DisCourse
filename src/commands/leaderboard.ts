@@ -34,7 +34,7 @@ export default class leaderboard implements IBotInteraction {
     }   
     
     cooldown(): number{
-        return 2;
+        return 600;
     }
     isThisInteraction(command: string): boolean {
         return this.aliases.includes(command);

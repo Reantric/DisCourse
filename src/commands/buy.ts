@@ -76,7 +76,7 @@ export default class buy implements IBotInteraction {
             );
 
         const embed: Discord.MessageEmbed = new Discord.MessageEmbed()
-            .setColor('#0099ff')
+            .setColor('RANDOM')
             .setTitle('Shop')
             .setDescription('A marketplace for special roles!')
             .setThumbnail('https://cdn.discordapp.com/attachments/775700759869259779/885703618097983539/AKedOLQgG2F4XjLYwul4pevvcE9rrDtYeu-E7vHVl8Xf9gs900-c-k-c0x00ffffff-no-rj.png')

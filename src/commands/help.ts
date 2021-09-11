@@ -34,18 +34,20 @@ export default class help implements IBotInteraction {
         if (interaction.member!.roles?.cache.some((role: { name: string; }) => role.name === 'Student')){
             embed.setTitle('DisCourse Command List')
             .setDescription('Here are a list of our student commands.')
-            .setColor('#5865F2')
+            .setColor('BLURPLE')
             .addFields(
                 {name:"/help", value:"Shows all available commands for that user"},
                 {name:"/leaderboard", value:"Shows the top 10 members with the most points in the class"},
-                {name:"/askquestion", value:"Ask a question that can be answered by other students or a teacher"},
-                {name:"/replys", value:"Reply to a question another student has asked"},
+                {name:"/ask", value:"Ask a question that can be answered by other students or a teacher"},
+                {name:"/answer", value:"Reply to a question another student has asked"},
+                {name:"/profile", value:"Check your own profile"},
+                {name:"/buy", value:"Buy items from the shop"},
             );
         }
         else if(interaction.member.roles.cache.some((role: { name: string; }) => role.name === 'Teacher')){
             embed.setTitle('DisCourse Command List')
             .setDescription('Here are a list of our teacher commands.')
-            .setColor('#5865F2')
+            .setColor('BLURPLE')
             .addFields(
                 {name:"/help", value:"Shows all available commands for that user"},
                 {name:"/attendance", value:"Sends a message to all students so that they can mark that they are present; the message will disappear after a certain amount of time"},

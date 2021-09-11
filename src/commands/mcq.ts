@@ -88,7 +88,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     let question = new Discord.MessageEmbed();
     question.setTitle("Multiple-Choice Question")
     .setDescription("Students, please answer the following question your teacher has asked.")
-    .setColor('#ED4245');
+    .setColor('YELLOW');
     
     let answerchoices = 'Select one of the following answers:';
     for(let i=0;i<answers.length;i++){
@@ -228,8 +228,8 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
             correcters = "Nobody got it right!";
         }
         const embed = new Discord.MessageEmbed()
-            .setColor('#ED4245')
-            .setTitle('Multiple-Choice Question Summary')
+            .setColor('WHITE')
+            .setTitle('Multiple-Choice Question Results')
             .setDescription('Here\'s what your students answered!')
             .addFields(
                 {name:interaction.options.getString("question"),value: answerlist},

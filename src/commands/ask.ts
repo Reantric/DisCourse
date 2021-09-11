@@ -38,9 +38,9 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student') as Discord.Role;
     const question = new Discord.MessageEmbed();
     question.setTitle("Your classmate has a question!")
-    .setColor('#FEE75C')
+    .setColor('RANDOM')
     .setDescription(`Asked by: ${interaction.member.displayName} #${interaction.member.user.discriminator}`)
-    .setThumbnail(interaction.member.user.avatarURL)
+    .setThumbnail(interaction.member.user.displayAvatarURL)
     .addField(interaction.options.getString('question'),`Respond to this question using /answer with this question ID to have an opportunity to earn points!`)
     .setFooter(`Question ID: ${id}`)
     .setTimestamp();

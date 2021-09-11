@@ -5,7 +5,7 @@ import * as db from "quick.db";
 var questions = new db.table('qs');
 var helpid = 0;
 
-export default class replys implements IBotInteraction {
+export default class answer implements IBotInteraction {
 
     name(): string {
         return "answer";
@@ -57,9 +57,9 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
                 transfer = question;
                 const answer = new Discord.MessageEmbed();
                 answer.setTitle("A classmate answered your question!")
-                .setColor("#57F287")
+                .setColor("RANDOM")
                 .setDescription(`Answered by: ${interaction.member.displayName} #${interaction.member.user.discriminator}`)
-                .setThumbnail(interaction.member.user.avatarURL)
+                .setThumbnail(interaction.member.user.displayAvatarURL)
                 .addField(question,interaction.options.getString('answer'))
                 .setFooter(`Question ID: ${id}`)
                 .setTimestamp();
@@ -82,7 +82,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     const filter = (i: Discord.ButtonInteraction) => i.customId === `help${aid.toString()}`;
     
     const collector: Discord.InteractionCollector<Discord.ButtonInteraction> = interaction.channel!.createMessageComponentCollector(
-        { filter, time: 60*1000 } //2d
+        { filter, time: 2*24*60*60*1000 } //2d
         );
     let ptsEarned=0;
     setTimeout(() => {
@@ -96,7 +96,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         );
         msgToHold.edit({components: [row]});
 
-    },60*1000);//2d
+    },2*24*60*60*1000);//2d
 
     collector.on('collect', async (i: Discord.ButtonInteraction) => {
         //console.log(marked);
