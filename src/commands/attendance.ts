@@ -150,7 +150,7 @@ export default class attendance implements IBotInteraction {
                 ailunicEmbed.addField(`${member.displayName}#${member.user.discriminator}`, `${db.get(`${member.id}.absences`)} absence(s)`);
             })
             ailunicEmbed.setTimestamp()
-            .setFooter('Report!', 'https://i.pinimg.com/originals/80/fd/eb/80fdeb47d44130603f5a2e440c421a66.jpg');
+            .setFooter('Report!', `${Bot.user?.avatarURL}`);
 
 
             const channel: Discord.TextChannel = interaction.guild?.channels.cache.find((channel) => channel.name == 'teacher') as Discord.TextChannel;
