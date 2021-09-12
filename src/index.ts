@@ -135,7 +135,7 @@ Bot.once("ready", async () => {
                     if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
                         db.set(member.id,vals)
                     }
-                    if (!member.roles.cache.has(teacherID) || !member.roles.cache.has(studentID))
+                    if (!member.roles.cache.has(teacherID) && !member.roles.cache.has(studentID))
                         member.roles.add([h1gh as Discord.RoleResolvable]);
                 })
             })
@@ -164,6 +164,19 @@ Bot.on("messageCreate", msg => {
         msg.author.send(`Please talk to me on a server! This ensures more engagement and reliability.`);
         return;
     }
+})
+
+Bot.on("guildCreate",async guild => {
+    let h1gh = await init(guild);
+    guild.members.fetch().then((collection) => {
+        collection.forEach((member: Discord.GuildMember) => {
+            if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
+                db.set(member.id,vals)
+            }
+            if (!member.roles.cache.has(teacherID) && !member.roles.cache.has(studentID))
+                member.roles.add([h1gh as Discord.RoleResolvable]);
+        })
+    })
 })
 
 async function handleEvent(msg: Discord.Message){
