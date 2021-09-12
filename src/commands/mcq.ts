@@ -87,21 +87,19 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     interaction.reply({content: "Creating your question...", ephemeral:true});
     let question = new Discord.MessageEmbed();
     question.setTitle("Multiple-Choice Question")
-    .setDescription("Students, please answer the following question your teacher has asked.")
+    .setDescription(`Students, please answer the following question your teacher has asked.\n\n**${interaction.options.getString('question')}**\n\nSelect one of the following answers!`)
     .setColor('YELLOW');
     
-    let answerchoices = 'Select one of the following answers:';
     for(let i=0;i<answers.length;i++){
         try{
-            answerchoices+=`\n${answers[i].label}. ${answers[i].description}`; // change to addfield lataer
+            question.addField(answers[i].label, `**${answers[i].description}**`,true); // change to addfield lataer
         }
         finally{
         }
     }
     let time:Date = new Date();
     time.setHours(new Date().getHours()+interaction.options.getInteger('exptime'));
-    question.addField( interaction.options.getString('question'), answerchoices)
-    .addField("Points: ", interaction.options.getInteger('points').toString())
+    question.addField("Points: ", interaction.options.getInteger('points').toString(),false)
     .setFooter(`This question must be completed by ${time.getHours().toString().padStart(2,"0")}:${time.getMinutes().toString().padStart(2,"0")}`)
     .setTimestamp();
 
@@ -120,7 +118,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     const filter = (i: Discord.SelectMenuInteraction) => i.customId === id;
     const collector: Discord.InteractionCollector<Discord.SelectMenuInteraction> = 
         interaction.channel!.createMessageComponentCollector(
-            { filter, time: interaction.options.getInteger("exptime")*60*60*1000 }
+            { filter, time: interaction.options.getInteger("exptime")*60*1000 }
         );
 
 
@@ -214,8 +212,12 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
                 }
             }
         }
+
         if(noresponders === ""){
-            noresponders = "Everybody responded!";
+            if (noresponders == "" && wrongers == "" && correcters == "")
+                noresponders = "Nobody responded!";
+            else
+                noresponders = "Everybody responded!";
         }
         if(wrongers === ""){
             wrongers = "Nobody got it wrong!";
