@@ -1,7 +1,8 @@
-import * as Discord from "discord.js";
+import { Client, Role } from "discord.js";
+import { TextChannel } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { IBotInteraction } from "../api/capi";
 const { SlashCommandBuilder } = require('@discordjs/builders');
-
 
 export default class announcement implements IBotInteraction {
     private readonly aliases = ["announcement"]
@@ -31,20 +32,20 @@ perms(): "teacher" | "student" | "both" {
     return 'teacher';
  }
 
-async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
-    var role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student') as Discord.Role;
-    const channel: Discord.TextChannel = interaction.guild?.channels.cache.find((channel:any) => channel.name == 'announcements') as Discord.TextChannel;
+async runCommand(interaction: any, Bot: Client): Promise<void> {
+    var role = interaction.guild!.roles.cache.find((role: Role) => role.name == 'Student') as Role;
+    const channel: TextChannel = interaction.guild?.channels.cache.find((channel:any) => channel.name == 'announcements') as TextChannel;
             interaction.reply({content:"Creating announcement...", ephemeral:true});
-            let embed: Discord.MessageEmbed = new Discord.MessageEmbed();
+            let embed: EmbedBuilder = new EmbedBuilder();
             embed.setTitle("Announcement")
-            .setColor("RANDOM")
+            .setColor('Random')
             .setDescription("This is an important message from your teacher.")
-            .addField(interaction.options.getString("topic"),interaction.options.getString("body"))
+            .addFields(interaction.options.getString("topic"),interaction.options.getString("body"))
             .setThumbnail(interaction.user.displayAvatarURL)
             .setTimestamp()
             .setThumbnail(interaction.user.displayAvatarURL)
-            .setFooter(`Powered by DisCourse`)
-            channel.send({content:`<@&${role.id}>`,embeds:[embed]});
+            .setFooter({text: 'Powered by DisCourse'})
+            channel.send({content:`<@&${role.id}>`, embeds:[embed]});
             
     }
 } //runcommand ends

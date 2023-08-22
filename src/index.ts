@@ -17,22 +17,23 @@ import { IBotEvent } from "./api/eapi";
 import { setupInfo } from './setup';
 
 import {config} from 'dotenv';
+
 config();
 
-var db = require('quick.db');
-var userBehavior = new db.table('user');
-var qid = new db.table('id');
+const { QuickDB } = require("quick.db");
+const db = new QuickDB();
 
-const myIntents = [
+var userBehavior = db.table('user');
+var question_id = db.table('id');
+
+const botIntents = [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages
 ];
-const Bot: Client = new Client({intents: myIntents});
-
+const Bot: Client = new Client({intents: botIntents});
 let commands: IBotInteraction[] = [];
 let events: IBotEvent[] = [];
-
 const command_cooldowns: any = new Collection();
 
 function randint(min: number,max: number) {
@@ -174,7 +175,7 @@ Bot.once("ready", async () => {
         }], 
         status: 'online' });
     Bot.user?.setUsername("DisCourse");
-    qid.set("id", 0);
+    question_id.set("id", 0);
     
     Bot.guilds.fetch().then(() => {
         Bot.guilds.cache.forEach(async (guild: Guild) => {
