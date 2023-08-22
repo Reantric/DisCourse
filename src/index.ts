@@ -24,7 +24,7 @@ const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 
 var userBehavior = db.table('user');
-var question_id = db.table('id');
+var questionId = db.table('id');
 
 const botIntents = [
     GatewayIntentBits.Guilds,
@@ -175,7 +175,7 @@ Bot.once("ready", async () => {
         }], 
         status: 'online' });
     Bot.user?.setUsername("DisCourse");
-    question_id.set("id", 0);
+    questionId.set("id", 0);
     
     Bot.guilds.fetch().then(() => {
         Bot.guilds.cache.forEach(async (guild: Guild) => {

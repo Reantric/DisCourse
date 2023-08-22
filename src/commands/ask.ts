@@ -1,9 +1,12 @@
-import * as Discord from "discord.js";
+import { Client, Role } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { IBotInteraction } from "../api/capi";
 const { SlashCommandBuilder } = require('@discordjs/builders');
-import * as db from "quick.db";
-var qid = new db.table('id');
-var questioninfo = new db.table('qs');
+const { QuickDB } = require("quick.db");
+const db = new QuickDB();
+
+var questionId = db.table('id');
+var questionInfo = new db.table('qs');
 
 export default class ask implements IBotInteraction {
 
@@ -18,38 +21,47 @@ export default class ask implements IBotInteraction {
     cooldown(): number{
         return 600;
     }
+
     isThisInteraction(command: string): boolean {
         return command === "ask";
     }
-    data(): any {
-    return new SlashCommandBuilder()
-    .setName(this.name())
-    .setDescription(this.help())
-    .addStringOption((option:any) => option.setName('question').setDescription('Enter your question (just the question):').setRequired(true))
-}
-perms(): "teacher" | "student" | "both" {
-    return "student";
- }
 
-async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
-    var id = qid.get("id");
-    id = id.toString();
-    qid.set("id",qid.get("id")+1);
-    let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student') as Discord.Role;
-    const question = new Discord.MessageEmbed();
-    question.setTitle("Your classmate has a question!")
-    .setColor('RANDOM')
-    .setDescription(`Asked by: ${interaction.member.displayName} #${interaction.member.user.discriminator}`)
-    .setThumbnail(interaction.member.user.displayAvatarURL)
-    .addField(interaction.options.getString('question'),`Respond to this question using /answer with this question ID to have an opportunity to earn points!`)
-    .setFooter(`Question ID: ${id}`)
-    .setTimestamp();
-    let msgid = "";
-    interaction.channel.send({content:`<@&${role!.id}>`,embeds:[question]}).then((message:any) => {
-        msgid = message.id;
-        //console.log([msgid,interaction.member.user.id])
-        questioninfo.set(id,[msgid,interaction.member.user.id]);
-    }).catch((error:Error) => console.log(error));
-    interaction.reply({content:`Your question was sent!`, ephemeral: true});
-}
+    data(): any {
+        const commandBuilder = new SlashCommandBuilder();
+        commandBuilder.setName(this.name());
+        commandBuilder.setDescription(this.help());
+        commandBuilder.addStringOption(
+        {
+            name: 'question',
+            description: 'Enter your question:',
+            setRequired: true
+        }
+        );
+        return commandBuilder
+    }
+
+    perms(): "teacher" | "student" | "both" {
+        return "student";
+    }
+
+    async runCommand(interaction: any, Bot: Client): Promise<void> {
+        var id = questionId.get("id");
+        id = id.toString();
+        questionId.set("id", questionId.get("id") + 1);
+        let role = interaction.guild!.roles.cache.find((role: Role) => role.name == 'Student') as Role;
+        const question = new EmbedBuilder();
+        question.setTitle("Your classmate has a question!")
+        .setColor('Random')
+        .setDescription(`Asked by: ${interaction.member.displayName} #${interaction.member.user.discriminator}`)
+        .setThumbnail(interaction.member.user.displayAvatarURL)
+        .addFields(interaction.options.getString('question'),`Respond to this question using /answer with this question ID to have an opportunity to earn points!`)
+        .setFooter({text: `Question ID: ${id}`})
+        .setTimestamp();
+        let msgid = "";
+        interaction.channel.send({content:`<@&${role!.id}>`,embeds:[question]}).then((message:any) => {
+            msgid = message.id;
+            questionInfo.set(id,[msgid,interaction.member.user.id]);
+        }).catch((error:Error) => console.log(error));
+        interaction.reply({content:`Your question was sent!`, ephemeral: true});
+    }
 }
