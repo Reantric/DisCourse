@@ -1,8 +1,12 @@
 import { Client, Guild, GuildMember } from 'discord.js';
-import { RoleManager, ChannelManager } from 'discord.js';
-import { Snowflake, Collection, ApplicationCommand } from 'discord.js';
+import { RoleManager, GuildChannelManager } from 'discord.js';
+import { ApplicationCommand, ApplicationCommandPermissions } from 'discord.js';
+import { Interaction, CommandInteraction } from 'discord.js';
+import { Snowflake, Collection } from 'discord.js';
 import { PermissionFlagsBits, GatewayIntentBits } from 'discord.js';
-import { GuildChannelTypes } from 'discord.js';
+import { ChannelType, OverwriteType, ActivityType, ApplicationCommandPermissionType } from 'discord.js';
+import { RoleResolvable } from 'discord.js';
+import { Message } from 'discord.js';
 import * as Config from "./config";
 var db = require('quick.db');
 import { IBotInteraction } from "./api/capi";
@@ -52,7 +56,7 @@ let teacherID: string;
  */
 async function init(guild: Guild) {
     let roleManager: RoleManager = guild.roles;
-    let channelManager: ChannelManager = guild.channels;
+    let channelManager: GuildChannelManager = guild.channels;
 
     //what does this do?
     // await roleManager.fetch();
@@ -99,18 +103,21 @@ async function init(guild: Guild) {
     //This is a WIP
     // Consider using a for loop in case we decide to add new roles!
     let teacherChannel = channelManager.cache.some((channel) => channel.id == 'teacher');
-    if (!teacherChannel)
-        channelManager.create('teacher', {type: 'GUILD_TEXT', topic: 'DisCourse will send you info here.', 
-        permissionOverwrites:[
+    if (!teacherChannel) {
+        channelManager.create({
+        name: 'teacher', 
+        type: ChannelType.GuildText, 
+        topic: 'DisCourse will send you info here.', 
+        permissionOverwrites: [
             {
                 id: studentID,
                 deny: PermissionFlagsBits.ViewChannel,
-                type: "role"
+                type: OverwriteType.Role
             },
             {
                 id: roleManager.everyone,
                 deny: PermissionFlagsBits.ViewChannel,
-                type: "role"
+                type: OverwriteType.Role
             },
             {
                 id: teacherID,
@@ -118,46 +125,66 @@ async function init(guild: Guild) {
                     PermissionFlagsBits.SendMessages, 
                     PermissionFlagsBits.ViewChannel, 
                     PermissionFlagsBits.ViewAuditLog
-                ]
+                ],
+                type: OverwriteType.Role
             },
         ]});
+    }
 
     let annChannel = channelManager.cache.some((channel) => channel.name == 'announcements');
-    if (!annChannel)
-        channelManager.create('announcements', {type: 'GUILD_TEXT', topic: 'Messages from your teacher will go here!', permissionOverwrites:[
+    if (!annChannel) {
+        channelManager.create({
+        name: 'announcements',
+        type: ChannelType.GuildText, 
+        topic: 'Messages from your teacher will go here!', 
+        permissionOverwrites: [
             {
                 id: studentID,
-                deny: PermissionFlagsBits.SEND_MESSAGES,
-                allow: PermissionFlagsBits.VIEW_CHANNEL
+                deny: PermissionFlagsBits.SendMessages,
+                allow: PermissionFlagsBits.ViewChannel,
+                type: OverwriteType.Role
             },
             {
                 id: teacherID,
-                allow: [PermissionFlagsBits.SEND_MESSAGES, PermissionFlagsBits.VIEW_CHANNEL]
+                allow: [
+                    PermissionFlagsBits.SendMessages, 
+                    PermissionFlagsBits.ViewChannel
+                ],
+                type: OverwriteType.Role
             },
             {
                 id: roleManager.everyone,
-                allow: PermissionFlagsBits.VIEW_CHANNEL,
+                allow: PermissionFlagsBits.ViewChannel,
+                type: OverwriteType.Role
             }
-        ]});
-        return await roleManager.fetch(teacherID);
+        ]
+    });
+    }
+    
+    return await roleManager.fetch(teacherID);
 }
 
 Bot.once("ready", async () => {
-    console.log("This bot is online!"); //standard protocol when starting up the bot
-    Bot.user!.setPresence({ activities: [{ name: 'educational videos.', type:'WATCHING' }], status: 'online' });
+    console.log("This bot is online!");
+    Bot.user!.setPresence({ 
+        activities: [{ 
+            name: 'educational videos.', 
+            type: ActivityType.Watching 
+        }], 
+        status: 'online' });
     Bot.user?.setUsername("DisCourse");
     qid.set("id", 0);
     
     Bot.guilds.fetch().then(() => {
         Bot.guilds.cache.forEach(async (guild: Guild) => {
-            let h1gh = await init(guild);
+            let teacherRole = await init(guild);
             guild.members.fetch().then((collection) => {
                 collection.forEach((member: GuildMember) => {
                     if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
-                        db.set(member.id,vals)
+                        db.set(member.id, student)
                     }
                     if (!member.roles.cache.has(teacherID) && !member.roles.cache.has(studentID))
-                        member.roles.add([h1gh as Discord.RoleResolvable]);
+                        member.roles.add([teacherRole as RoleResolvable]);
                 })
             })
             
@@ -167,13 +194,13 @@ Bot.once("ready", async () => {
 
 Bot.on("guildMemberAdd", member => {
    if (!db.has(member.id)){ //if new member not in db, add them!
-    db.set(member.id,vals)
+    db.set(member.id, student)
    }
-   var role: any = member.roleManager.cache.find(role => role.name == "Student");
+   var role: any = member.guild.roles.cache.find(role => role.name == "Student");
    member.roles.add(role);
 })
 
-Bot.on("interactionCreate", async (interaction: Discord.Interaction) => {
+Bot.on("interactionCreate", async (interaction: Interaction) => {
 	if (!interaction.isCommand()) return;
     handleCommand(interaction);
 });
@@ -181,26 +208,26 @@ Bot.on("interactionCreate", async (interaction: Discord.Interaction) => {
 Bot.on("messageCreate", msg => {
     if (msg.author.bot) return;
     handleEvent(msg); // checks every message regardless of what it contains
-    if (msg.channel.type == 'DM'){
+    if (msg.channel.type == ChannelType.DM){
         msg.author.send(`Please talk to me on a server! This ensures more engagement and reliability.`);
         return;
     }
 })
 
 Bot.on("guildCreate",async guild => {
-    let h1gh = await init(guild);
+    let teacherRole = await init(guild);
     guild.members.fetch().then((collection) => {
-        collection.forEach((member: Discord.GuildMember) => {
+        collection.forEach((member: GuildMember) => {
             if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
-                db.set(member.id,vals)
+                db.set(member.id, student)
             }
             if (!member.roles.cache.has(teacherID) && !member.roles.cache.has(studentID))
-                member.roles.add([h1gh as Discord.RoleResolvable]);
+                member.roles.add([teacherRole as RoleResolvable]);
         })
     })
 })
 
-async function handleEvent(msg: Discord.Message){
+async function handleEvent(msg: Message){
     let arr=db.get(`${msg.author.id}.messages`)
     if (arr.length < 10){ // if not full
         db.push(`${msg.author.id}.messages`,msg.content);
@@ -213,7 +240,7 @@ async function handleEvent(msg: Discord.Message){
     }
 }
 
-async function handleCommand(interaction: Discord.CommandInteraction){
+async function handleCommand(interaction: CommandInteraction){
     let command = interaction.commandName;
     let args: any = []//msg.content.split(" ").slice(1);
     //Make command and args lowercase
@@ -224,7 +251,7 @@ async function handleCommand(interaction: Discord.CommandInteraction){
                 continue;
             } //Checks IBotCommands (located in api.ts) for layout, if isThisCommand String is not equal to command, skip!
             if (!cooldowns.has(commandClass.name())) { //if name String in capi.ts (IBotCommand) == to command
-                cooldowns.set(commandClass.name(), new Discord.Collection()); //store the command name and a obj key-val 
+                cooldowns.set(commandClass.name(), new Collection()); //store the command name and a obj key-val 
             }
             
             const now = Date.now();
@@ -272,7 +299,7 @@ export class HelpUtil {
 
 export const helpUtil = new HelpUtil();
 
-function loadCommands(commandsPath: string, allSlashCommands: Discord.Collection<Discord.Snowflake,Discord.ApplicationCommand>){
+function loadCommands(commandsPath: string, allSlashCommands: Collection<Snowflake, ApplicationCommand>){
     if (!Config.config.commands || (Config.config.commands as string[]).length == 0) return; //goes into config.ts and reads the commands, checks if they are valid
     
     let commandDatas: any[] = [];
@@ -300,25 +327,28 @@ function loadCommands(commandsPath: string, allSlashCommands: Discord.Collection
         }
         //console.log(xd,command.name(), command.perms());
         if (xd != ''){
-            const permissions: Discord.ApplicationCommandPermissionData[] = [
+            const permissions: ApplicationCommandPermissions[] = [
                 {
                     id: xd,
-                    type: 'ROLE',
+                    type: ApplicationCommandPermissionType.Role,
                     permission: true,
                 },
                 {
                     id: complementxd,
-                    type: 'ROLE',
+                    type: ApplicationCommandPermissionType.Role,
                     permission: false,
                 },
             ];
 
-            permCommand?.permissions.add({permissions});
+            permCommand?.permissions.add({
+                permissions,
+                token: Config.config.token
+            });
 
         }
     }
 
-    const rest: any = new REST({ version: '9' }).setToken(Config.config.token);
+    const rest: any = new REST({ version: '10' }).setToken(Config.config.token);
 
      (async () => {
         try {
