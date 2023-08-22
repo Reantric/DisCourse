@@ -1,5 +1,6 @@
 import * as Discord from "discord.js";
 import { IBotInteraction } from "../api/capi";
+import { EmbedBuilder } from "discord.js";
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 const { SlashCommandBuilder } = require('@discordjs/builders');
@@ -70,11 +71,10 @@ export default class leaderboard implements IBotInteraction {
         }
         userArray.sort(cTC)
       //  console.log(userArray);
-        const embed = new Discord.MessageEmbed()
+        const embed = new EmbedBuilder()
         .setTitle('Points Leaderboard!')
-        
-        .setColor('AQUA')
-        .setAuthor(Bot.user!.username, Bot.user!.avatarURL()!)
+        .setColor('Aqua')
+        .setAuthor({name: Bot.user!.username, iconURL: Bot.user!.avatarURL()!})
         //.setImage('https://i.redd.it/l28662sbcec51.png')
         .setThumbnail('https://i.imgur.com/aowYZQG.jpeg')
         //.setAuthor(msg.author.username)
@@ -132,7 +132,7 @@ export default class leaderboard implements IBotInteraction {
         else
             average = average.toFixed(2);
 
-        embed.addField(`Average Server Score: `,`${(average)}`);
+        embed.addFields({name: `Average Server Score: `, value:`${(average)}`});
         
         for(var i=0;i<count;i++){
             let username = Bot.users.cache.find(user => user.id === userArray[i][0])?.username;//cannot read property 0 of indefined
@@ -176,10 +176,10 @@ export default class leaderboard implements IBotInteraction {
         
                         
 
-        embed.addField(`You → ${initializer} **#${ind+1}: ${interaction.member!.user.username}**`,`**${Number(userArray[ind][1])}**`)
-        
-
-        //interaction.channel.send(embed)
+        embed.addFields({
+            name: `You → ${initializer} **#${ind+1}: ${interaction.member!.user.username}**`,
+            value:`**${Number(userArray[ind][1])}**`
+        })
                 
     interaction.reply({embeds: [embed], ephemeral:false})
 }

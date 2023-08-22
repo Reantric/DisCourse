@@ -1,6 +1,8 @@
-import * as Discord from "discord.js";
+import { Embed, EmbedBuilder, InteractionCollector, StringSelectMenuInteraction, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import { Client, ButtonStyle } from "discord.js";
 import { IBotInteraction } from "../api/capi";
-import * as db from "quick.db";
+const { QuickDB } = require("quick.db");
+const db = new QuickDB();
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageSelectMenu, MessageEmbed, Permissions } = require('discord.js');
 
@@ -33,7 +35,7 @@ export default class buy implements IBotInteraction {
         return 'both';
      }
 
-    async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
+    async runCommand(interaction: any, Bot: Client): Promise<void> {
         const role_name = interaction.options.getString('role_name');
         const color1 = interaction.options.getString('color').toUpperCase();
         const row = new MessageActionRow()
@@ -74,8 +76,8 @@ export default class buy implements IBotInteraction {
                         },
                     ]),
             );
-        const embed: Discord.MessageEmbed = new Discord.MessageEmbed()
-            .setColor('RANDOM')
+        const embed = new EmbedBuilder()
+            .setColor('Random')
             .setTitle('Shop')
             .setDescription('A marketplace for special roles!')
             .setThumbnail('https://cdn.discordapp.com/attachments/775700759869259779/885703618097983539/AKedOLQgG2F4XjLYwul4pevvcE9rrDtYeu-E7vHVl8Xf9gs900-c-k-c0x00ffffff-no-rj.png')
@@ -92,27 +94,27 @@ export default class buy implements IBotInteraction {
         //console.log(interaction.fetchReply())
          interaction.reply({ content: 'Here are your choices:', ephemeral: true, embeds: [embed], components: [row] });
          setTimeout(() => {
-            const row = new Discord.MessageActionRow()
+            const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
-                new Discord.MessageButton()
+                new ButtonBuilder()
                     .setCustomId('ting')
                     .setLabel(`Expired`)
-                    .setStyle('DANGER')
+                    .setStyle(ButtonStyle.Danger)
                     .setDisabled(true),
             );
             interaction.editReply({ content: "The shop has expired.", components: [row] });
         },20*1000);
         
         
-    const filter = (i: Discord.SelectMenuInteraction) => i.customId === 'shop';
-    const collector: Discord.InteractionCollector<Discord.SelectMenuInteraction> = 
+    const filter = (i: StringSelectMenuInteraction) => i.customId === 'shop';
+    const collector: InteractionCollector<StringSelectMenuInteraction> = 
         interaction.channel!.createMessageComponentCollector(
             { filter, time: 20*1000 }
         );
 
 
     // var answered: Discord.Collection<string,boolean> = new Discord.Collection();
-    collector.on('collect', async (i: Discord.SelectMenuInteraction) => {
+    collector.on('collect', async (i: StringSelectMenuInteraction) => {
     if(i.customId == 'shop'){
         i.deferUpdate();
         if(i.values[0]==='1'){

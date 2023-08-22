@@ -1,7 +1,7 @@
-import * as Discord from "discord.js";
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 import { IBotInteraction } from "../api/capi";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, Client, Collection, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, InteractionCollector, Message, Role, TextChannel } from "discord.js";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 export default class attendance implements IBotInteraction {
@@ -36,21 +36,20 @@ export default class attendance implements IBotInteraction {
 			.setRequired(true))
         .addIntegerOption((option:any) =>
             option.setName('exptime')
-                .setDescription('The amount of time attendance is valid for!'));
+                .setDescription('The amount of minutes attendance is valid for!'));
     }
 
-    async runCommand(interaction: Discord.CommandInteraction, Bot: Discord.Client): Promise<void> { // TODO: exptime is in seconds, change to minutes later
-        let allRoleUsers: Set<Discord.GuildMember> = new Set();
+    async runCommand(interaction: CommandInteraction, Bot: Client): Promise<void> { // TODO: exptime is in seconds, change to minutes later
+        let allRoleUsers: Set<GuildMember> = new Set();
         await interaction.guild!.members.fetch();
-        let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student') as Discord.Role;
-        interaction.guild!.members.cache.forEach((v: Discord.GuildMember) => {
+        let role = interaction.guild!.roles.cache.find((role: Role) => role.name == 'Student') as Role;
+        interaction.guild!.members.cache.forEach((v: GuildMember) => {
             if (v.roles.cache.has(role!.id)){
                 allRoleUsers.add(v);
             }
         });
-
-        //console.log(allRoleUsers);
-
+        
+        if (!interaction.isChatInputCommand()) return;
         var exptime: number = interaction.options.getInteger('exptime') as number;
         if (exptime == null)
             exptime = 10;
@@ -68,43 +67,46 @@ export default class attendance implements IBotInteraction {
       //  console.log(ms);
         await interaction.reply({ephemeral: true, content:`Attendance will appear at ${time[0].toString().padStart(2,"0")}:${time[1].toString().padStart(2,"0")} and end at ${endTime.getHours().toString().padStart(2,"0")}:${endTime.getMinutes().toString().padStart(2,"0")}`});
         setTimeout(() => {
-            this.eric(Bot,interaction,exptime,allRoleUsers, role);
-            setInterval(this.eric,24*60*60*1000, Bot, interaction, exptime, allRoleUsers, role);
-        },ms) // ms
+            this.collect(Bot,interaction,exptime,allRoleUsers, role);
+            setInterval(this.collect, 24*60*60*1000, Bot, interaction, exptime, allRoleUsers, role);
+        }, ms)
         
     }
 
-    async eric(Bot: Discord.Client, interaction: Discord.CommandInteraction, exptime: number, allRoleUsers: Set<Discord.GuildMember>, role: any){
+    async collect(Bot: Client, interaction: CommandInteraction, exptime: number, allRoleUsers: Set<GuildMember>, role: any){
      //   console.log("running timeout");
-        const marked: Discord.Collection<string,boolean> = new Discord.Collection();
-        let msgToHold: Discord.Message;
-        const row = new Discord.MessageActionRow()
+        const marked: Collection<string,boolean> = new Collection();
+        let msgToHold: Message;
+        const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
-                new Discord.MessageButton()
+                new ButtonBuilder()
                     .setCustomId('attend')
                     .setLabel(`I'm here!`)
-                    .setStyle('PRIMARY'),
+                    .setStyle(ButtonStyle.Primary),
             );
-        const channel: Discord.TextChannel = interaction.guild?.channels.cache.find((channel) => channel.name == 'announcements') as Discord.TextChannel;
+        const channel: TextChannel = interaction.guild?.channels.cache.find((channel) => channel.name == 'announcements') as TextChannel;
         msgToHold = await channel.send({ content: `Click here to mark yourself present! \n <@&${role.id}>`, components: [row] });
 
-        const filter = (i: Discord.ButtonInteraction) => i.customId === 'attend';
+        const collectorFilter = (i: ButtonInteraction) => i.customId === 'attend';
     
-        const collector: Discord.InteractionCollector<Discord.ButtonInteraction> = channel.createMessageComponentCollector(
-            { filter, time: exptime*1000 }
-            );
+        const collector: InteractionCollector<ButtonInteraction> = channel.createMessageComponentCollector(
+            { 
+                componentType: ComponentType.Button, 
+                filter: collectorFilter, 
+                time: exptime*1000 
+            }
+        );
         
-        collector.on('collect', async (i: Discord.ButtonInteraction) => {
-            //console.log(marked);
+        collector.on('collect', async (i: ButtonInteraction) => {
             if (i.customId == 'attend'){
                 i.deferUpdate();
-                if (!(i.member as Discord.GuildMember).roles.cache.has(role.id)){
+                if (!(i.member as GuildMember).roles.cache.has(role.id)){
                     i.followUp({content: "You aren't a student!", ephemeral: true});
                 } else {
                 if (!marked.has(i.member!.user.id)){
                     i.followUp({content: `Marked you here! You earned a point!`, ephemeral:true});
                     marked.set(i.member!.user.id,false);
-                    allRoleUsers.delete(i.member as Discord.GuildMember);
+                    allRoleUsers.delete(i.member as GuildMember);
                     db.set(`${i.member!.user.id}.points`,db.get(`${i.member!.user.id}.points`)+1);
                 }
                 else if (!marked.get(i.member!.user.id)){
@@ -127,31 +129,34 @@ export default class attendance implements IBotInteraction {
                 return 0;
             });
 
-            const row = new Discord.MessageActionRow()
+            const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
-                new Discord.MessageButton()
+                new ButtonBuilder()
                     .setCustomId('attend')
                     .setLabel(`Expired`)
-                    .setStyle('DANGER')
+                    .setStyle(ButtonStyle.Danger)
                     .setDisabled(true),
             );
             msgToHold.edit({ content: `You were too late! \n <@&${role.id}>`, components: [row] });
 
-            const ailunicEmbed = new Discord.MessageEmbed()
+            const ailunicEmbed = new EmbedBuilder()
             .setColor('#FFFFFF')
             .setTitle('Absent Students!')
             .setDescription('These people did not mark themselves present!')
             .setThumbnail('https://images.pexels.com/photos/963486/pexels-photo-963486.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940');
 
-            allRoleUsers.forEach((member: Discord.GuildMember) => {
+            allRoleUsers.forEach((member: GuildMember) => {
                 db.add(`${member.id}.absences`,1);
-                ailunicEmbed.addField(`${member.displayName}#${member.user.discriminator}`, `${db.get(`${member.id}.absences`)} absence(s)`);
+                ailunicEmbed.addFields({
+                    name: `${member.displayName}#${member.user.discriminator}`, 
+                    value: `${db.get(`${member.id}.absences`)} absence(s)`
+                });
             })
             ailunicEmbed.setTimestamp()
-            .setFooter('Attendance Report');
+            .setFooter({text: 'Attendance Report'});
 
 
-            const channel: Discord.TextChannel = interaction.guild?.channels.cache.find((channel) => channel.name == 'teacher') as Discord.TextChannel;
+            const channel: TextChannel = interaction.guild?.channels.cache.find((channel) => channel.name == 'teacher') as TextChannel;
             channel.send({embeds: [ailunicEmbed]});
         }
         );

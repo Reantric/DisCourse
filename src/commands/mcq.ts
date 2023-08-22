@@ -1,5 +1,6 @@
-import * as Discord from "discord.js";
+import { Client, Collection, GuildMember, InteractionCollector, Message, Role, SelectMenuInteraction, TextChannel } from "discord.js";
 import { IBotInteraction } from "../api/capi";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder } from "discord.js";
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 var qid = db.table('id');
@@ -40,10 +41,10 @@ export default class mcq implements IBotInteraction {
         return 'teacher';
      }
 
-async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
-    let msgToHold: Discord.Message;
+async runCommand(interaction: any, Bot: Client): Promise<void> {
+    let msgToHold: Message;
     //creates answer choices
-    let role = interaction.guild!.roles.cache.find((role: Discord.Role) => role.name == 'Student') as Discord.Role;
+    let role = interaction.guild!.roles.cache.find((role: Role) => role.name == 'Student') as Role;
     const arr = ['right-answer','wrong-answer1','wrong-answer2','wrong-answer3','wrong-answer4'];
     let answers: any[] = [];
     let labels = ["A","B","C","D","E"]
@@ -78,18 +79,18 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     id = id.toString();
     qid.set("id",qid.get("id")+1);
     //makes/sends the message
-    const row = new Discord.MessageActionRow()
+    const row = new ActionRowBuilder()
         .addComponents(
-            new Discord.MessageSelectMenu()
+            new StringSelectMenuBuilder()
             .setCustomId(id)
             .setPlaceholder('Pick an answer!')
             .addOptions(answers),
         );
     interaction.reply({content: "Creating your question...", ephemeral:true});
-    let question = new Discord.MessageEmbed();
+    let question = new EmbedBuilder();
     question.setTitle("Multiple-Choice Question")
     .setDescription("Students, please answer the following question your teacher has asked.")
-    .setColor('YELLOW');
+    .setColor('Yellow');
     
     let answerchoices = 'Select one of the following answers:';
     for(let i=0;i<answers.length;i++){
@@ -101,9 +102,9 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     }
     let time:Date = new Date();
     time.setHours(new Date().getHours()+interaction.options.getInteger('exptime'));
-    question.addField( interaction.options.getString('question'), answerchoices)
-    .addField("Points: ", interaction.options.getInteger('points').toString())
-    .setFooter(`This question must be completed by ${time.getHours().toString().padStart(2,"0")}:${time.getMinutes().toString().padStart(2,"0")}`)
+    question.addFields( interaction.options.getString('question'), answerchoices)
+    .addFields("Points: ", interaction.options.getInteger('points').toString())
+    .setFooter({text: `This question must be completed by ${time.getHours().toString().padStart(2,"0")}:${time.getMinutes().toString().padStart(2,"0")}`})
     .setTimestamp();
 
     msgToHold = await interaction.channel.send({ embeds:[question],content: `<@&${role.id}>`, components: [row] });
@@ -111,22 +112,22 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     let allRoleUsers:any[] = [];
     let responses:any={};
     await interaction.guild.members.fetch().then((fetchedMembers:any) => {
-        fetchedMembers.forEach((v: Discord.GuildMember) => {
+        fetchedMembers.forEach((v: GuildMember) => {
             if (v.roles.cache.some((role: { name: string; }) => role.name === 'Student')){
                 allRoleUsers.push(v);
                 responses[v.id]=[v,null];
             }
         });
     })
-    const filter = (i: Discord.SelectMenuInteraction) => i.customId === id;
-    const collector: Discord.InteractionCollector<Discord.SelectMenuInteraction> = 
+    const filter = (i: SelectMenuInteraction) => i.customId === id;
+    const collector: InteractionCollector<SelectMenuInteraction> = 
         interaction.channel!.createMessageComponentCollector(
             { filter, time: interaction.options.getInteger("exptime")*60*60*1000 }
         );
 
 
-    var answered: Discord.Collection<string,boolean> = new Discord.Collection();
-    collector.on('collect', async (i: Discord.SelectMenuInteraction) => {
+    var answered: Collection<string, boolean> = new Collection();
+    collector.on('collect', async (i: SelectMenuInteraction) => {
         if (i.customId == id){
             i.deferUpdate();
             if (!allRoleUsers.some(m => m.id == i.user.id)){
@@ -158,12 +159,12 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
 
     collector.on('end', () => {
         //changes message
-        const row = new Discord.MessageActionRow()
+        const row = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
-            new Discord.MessageButton()
+            new ButtonBuilder()
                 .setCustomId(id)
                 .setLabel(`Finished`)
-                .setStyle('DANGER')
+                .setStyle(ButtonStyle.Danger)
                 .setDisabled(true),
         );
         msgToHold.edit({ content: "You can no longer answer this question.", components: [row] });
@@ -224,8 +225,8 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
         if(correcters === ""){
             correcters = "Nobody got it right!";
         }
-        const embed = new Discord.MessageEmbed()
-            .setColor('WHITE')
+        const embed = new EmbedBuilder()
+            .setColor('White')
             .setTitle('Multiple-Choice Question Results')
             .setDescription('Here\'s what your students answered!')
             .addFields(
@@ -235,9 +236,9 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
                 {name:`Did Not Respond:`, value: noresponders},
                 )
             .setTimestamp()
-            .setFooter(`Question ID: ${id}`);
+            .setFooter({text: `Question ID: ${id}`});
 
-            const channel: Discord.TextChannel = interaction.guild?.channels.cache.find((channel:any) => channel.name == 'teacher') as Discord.TextChannel;
+            const channel: TextChannel = interaction.guild?.channels.cache.find((channel:any) => channel.name == 'teacher') as TextChannel;
             channel.send({embeds: [embed]});
     })
 }
