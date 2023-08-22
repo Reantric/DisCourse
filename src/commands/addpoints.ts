@@ -1,6 +1,7 @@
 import * as Discord from "discord.js";
 import { IBotInteraction } from "../api/capi";
-import * as db from "quick.db";
+const { QuickDB } = require("quick.db");
+const db = new QuickDB();
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 
@@ -37,8 +38,7 @@ perms(): "teacher" | "student" | "both" {
 
 async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     const int1 = interaction.options.getInteger('points')
-    const user = interaction.options.getMember('target');//gets member
-    //console.log(int1)
+    const user = interaction.options.getMember('target');
     db.add(`${user.id}.points`,int1)
     interaction.reply({content: `You added ${int1} point(s) to ${user}.`, ephemeral:true});
 }
