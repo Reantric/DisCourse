@@ -1,6 +1,7 @@
 import * as Discord from "discord.js";
 import { IBotEvent } from "../api/eapi";
-import * as db from "quick.db";
+const { QuickDB } = require("quick.db");
+const db = new QuickDB();
 //var Filter = require('bad-words'); //npm install badwords
 //let filter = new Filter();
 var forbiddenWords = ['mango', 'grape','apple','orange','tangerine','lemon','banana','peach','plum','pineapple','papaya'];
