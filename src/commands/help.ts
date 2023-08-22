@@ -1,4 +1,5 @@
-import * as Discord from "discord.js";
+import { Client, Role } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { IBotInteraction } from "../api/capi";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 import { helpUtil } from "..";
@@ -29,15 +30,19 @@ export default class help implements IBotInteraction {
         return 'both';
      }
 
-    async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
-        let embed = new Discord.MessageEmbed();
+    async runCommand(interaction: any, Bot: Client): Promise<void> {
+        let embed = new EmbedBuilder();
         let isTeacher = interaction.member!.roles?.cache.some((role: { name: string; }) => role.name === 'Teacher');
         embed.setTitle('DisCourse Command List')
         .setDescription(`Here are a list of our ${isTeacher ? 'teacher' : 'student'} commands.`)
-        .setColor('BLURPLE');
-        helpUtil.get().forEach((helpPerm: string[],name: string) => {
-            if ((helpPerm[1] != 'student' && isTeacher) || (helpPerm[1] != 'teacher' && !isTeacher))
-                embed.addField('/'+name,helpPerm[0]);
+        .setColor('Blurple');
+        helpUtil.get().forEach((helpPerm: string[], name: string) => {
+            if ((helpPerm[1] != 'student' && isTeacher) || (helpPerm[1] != 'teacher' && !isTeacher)) {
+                embed.addFields({
+                    name: '/' + name, 
+                    value: helpPerm[0]
+                });
+            }
         })
         await interaction.reply({embeds: [embed], ephemeral: true});  
     }   
