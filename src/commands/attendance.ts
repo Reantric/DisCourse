@@ -1,5 +1,6 @@
 import * as Discord from "discord.js";
-import * as db from "quick.db";
+const { QuickDB } = require("quick.db");
+const db = new QuickDB();
 import { IBotInteraction } from "../api/capi";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
@@ -147,7 +148,7 @@ export default class attendance implements IBotInteraction {
                 ailunicEmbed.addField(`${member.displayName}#${member.user.discriminator}`, `${db.get(`${member.id}.absences`)} absence(s)`);
             })
             ailunicEmbed.setTimestamp()
-            .setFooter('DisCourse Report!');
+            .setFooter('Attendance Report');
 
 
             const channel: Discord.TextChannel = interaction.guild?.channels.cache.find((channel) => channel.name == 'teacher') as Discord.TextChannel;

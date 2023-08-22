@@ -1,8 +1,9 @@
 import * as Discord from "discord.js";
 import { IBotInteraction } from "../api/capi";
 const { SlashCommandBuilder } = require('@discordjs/builders');
-import * as db from "quick.db";
-var questions = new db.table('qs');
+const { QuickDB } = require("quick.db");
+const db = new QuickDB();
+var questions = db.table('qs');
 var helpid = 0;
 
 export default class answer implements IBotInteraction {
@@ -55,7 +56,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
             .then((msg:any) => {
                 const question = msg.embeds[0].fields[0].name;
                 transfer = question;
-                const answer = new Discord.MessageEmbed();
+                const answer = new Discord.EmbedBuilder();
                 answer.setTitle("A classmate answered your question!")
                 .setColor("RANDOM")
                 .setDescription(`Answered by: ${interaction.member.displayName} #${interaction.member.user.discriminator}`)
@@ -123,7 +124,7 @@ async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
 
     collector.on('end', async () => {
 
-        const embed = new Discord.MessageEmbed()
+        const embed = new Discord.EmbedBuilder()
         .setColor("#57F287")
         .setTitle('Response Summary!')
         .setDescription('Thanks for taking the time to answer this question!')

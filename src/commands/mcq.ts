@@ -1,7 +1,8 @@
 import * as Discord from "discord.js";
 import { IBotInteraction } from "../api/capi";
-import * as db from "quick.db";
-var qid = new db.table('id');
+const { QuickDB } = require("quick.db");
+const db = new QuickDB();
+var qid = db.table('id');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 //teacheronly
 export default class mcq implements IBotInteraction {

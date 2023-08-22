@@ -1,8 +1,8 @@
 import * as Discord from "discord.js";
 import { IBotInteraction } from "../api/capi";
 const { SlashCommandBuilder } = require('@discordjs/builders');
-import * as db from "quick.db";
-
+const { QuickDB } = require("quick.db");
+const db = new QuickDB();
 
 export default class profile implements IBotInteraction {
 
