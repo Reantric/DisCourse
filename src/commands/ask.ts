@@ -1,4 +1,4 @@
-import { Client, Role } from "discord.js";
+import { Client, Role, SlashCommandStringOption } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { IBotInteraction } from "../api/capi";
 const { SlashCommandBuilder } = require('@discordjs/builders');
@@ -6,7 +6,7 @@ const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 
 var questionId = db.table('id');
-var questionInfo = new db.table('qs');
+var questionInfo = db.table('qs');
 
 export default class ask implements IBotInteraction {
 
@@ -30,11 +30,10 @@ export default class ask implements IBotInteraction {
         const commandBuilder = new SlashCommandBuilder();
         commandBuilder.setName(this.name());
         commandBuilder.setDescription(this.help());
-        commandBuilder.addStringOption({
-            name: 'question',
-            description: 'Enter your question: ',
-            setRequired: true
-        });
+        commandBuilder.addStringOption((option: SlashCommandStringOption) =>
+        option.setName('question')
+        .setDescription('Enter your question: ').
+        setRequired(true));
         return commandBuilder
     }
 

@@ -1,4 +1,4 @@
-import { Client, Guild, GuildMember } from 'discord.js';
+import { Client, Guild, GuildMember, Role } from 'discord.js';
 import { RoleManager, GuildChannelManager } from 'discord.js';
 import { ApplicationCommand, ApplicationCommandPermissions } from 'discord.js';
 import { Interaction, CommandInteraction } from 'discord.js';
@@ -61,17 +61,17 @@ async function init(guild: Guild) {
     let channelManager: GuildChannelManager = guild.channels;
 
     //what does this do?
-    // await roleManager.fetch();
-    // await channelManager.fetch();
-    // await Bot.application?.fetch();
+    await roleManager.fetch();
+    await channelManager.fetch();
+    await Bot.application?.fetch();
 
-    if (!roleManager.cache.some((role: any) => role.name === 'Teacher')) {
+    if (!roleManager.cache.some((role: Role) => role.name === 'Teacher')) {
         await roleManager.create({ name: 'Teacher', color: 'Yellow', permissions: [
             PermissionFlagsBits.Administrator
         ]});
     }
 
-    if (!roleManager.cache.some((role: any) => role.name === 'Student')) {
+    if (!roleManager.cache.some((role: Role) => role.name === 'Student')) {
         await roleManager.create({ name: 'Student', color: 'Red', permissions: [
             PermissionFlagsBits.ViewChannel,
             PermissionFlagsBits.AddReactions,
@@ -97,14 +97,15 @@ async function init(guild: Guild) {
 
     studentID = roleManager.cache.find(role => role.name == 'Student')?.id as string;
     teacherID = roleManager.cache.find(role => role.name == 'Teacher')?.id as string;
-    await Bot.guilds.cache.get('886326356072337438')?.commands.fetch()
-        .then((col: Collection<Snowflake, ApplicationCommand>) => {
-        loadCommands(`${__dirname}/commands`,col);
+    console.log("before fetch")
+    await Bot.guilds.cache.get(setupInfo.guildID)?.commands.fetch()
+        .then((collection: Collection<Snowflake, ApplicationCommand>) => {
+        loadCommands(`${__dirname}/commands`, collection);
         loadEvents(`${__dirname}/events`)
     })
     //This is a WIP
     // Consider using a for loop in case we decide to add new roles!
-    let teacherChannel = channelManager.cache.some((channel) => channel.id == 'teacher');
+    let teacherChannel = channelManager.cache.some((channel) => channel.name == 'teacher');
     if (!teacherChannel) {
         channelManager.create({
         name: 'teacher', 
@@ -280,7 +281,7 @@ async function handleCommand(interaction: CommandInteraction){
         }
         catch(e){
             console.log(e);
-        }  //if error, log it!
+        } 
     }
 } 
 export class HelpUtil {
@@ -302,6 +303,7 @@ export class HelpUtil {
 export const helpUtil = new HelpUtil();
 
 function loadCommands(commandsPath: string, allSlashCommands: Collection<Snowflake, ApplicationCommand>){
+    console.log("Function called");
     if (!setupInfo.commands || (setupInfo.commands as string[]).length == 0) return;
     
     let commandDatas: any[] = [];
@@ -350,22 +352,24 @@ function loadCommands(commandsPath: string, allSlashCommands: Collection<Snowfla
         }
     }
 
-    const rest: any = new REST({ version: '10' }).setToken(process.env.TOKEN!);
+    //const rest: any = new REST({ version: '10' }).setToken(process.env.TOKEN!);
 
-     (async () => {
+    const sendCommands = (async () => {
+        console.log("Running")
         try {
             console.log('Started refreshing application (/) commands.');
 
-            await rest.put(
-                Routes.applicationGuildCommands(process.env.CLIENT_ID!, setupInfo.guildID),
-                { body: commandDatas },
-            );
+            // await rest.put(
+            //     Routes.applicationGuildCommands(process.env.CLIENT_ID!, setupInfo.guildID),
+            //     { body: commandDatas },
+            // );
 
             console.log('Successfully reloaded application (/) commands.');
         } catch (error) {
             console.error(error);
         }
-    })(); 
+    });
+    sendCommands();
 }
 
 function loadEvents(commandsPath: string){
@@ -377,6 +381,7 @@ function loadEvents(commandsPath: string){
         const event = new eventsClass() as IBotEvent; //command now follows same layout as IBotCommand in form commandsClass(), created new object
         events.push(event); //adds event to events array
     }
+    console.log('done');
 }
-
+console.log('here');
 Bot.login(process.env.TOKEN!);

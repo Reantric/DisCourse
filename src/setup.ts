@@ -6,6 +6,6 @@ export let setupInfo = {
     //"prefix": "!",
     "commands": commandFiles,
     "events": eventFiles,
-    "guildID":"886326356072337438"
+    "guildID":"775700759869259776"
 }
 

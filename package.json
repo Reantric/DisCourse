@@ -9,6 +9,7 @@
   "author": "Reantric, fanman1, ezou626",
   "license": "ISC",
   "dependencies": {
+    "better-sqlite3": "^8.5.1",
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
     "quick.db": "^9.1.7"

@@ -17,7 +17,8 @@ export default class moderator implements IBotEvent {
     
     
     async runEvent(msg: Discord.Message, Bot: Discord.Client): Promise<void> {
-        let arr=db.get(`${msg.author.id}.messages`)
+        let arr = db.get(`${msg.author.id}.messages`);
+        console.log(arr);
         let allMessages: string = arr.join('');
         
         for(let i=0; i<forbiddenWords.length;i++){

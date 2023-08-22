@@ -1,4 +1,4 @@
-import { Client, Role } from "discord.js";
+import { ApplicationCommand, ApplicationCommandOption, ApplicationCommandStringOption, Client, CommandInteraction, Role, SlashCommandStringOption } from "discord.js";
 import { TextChannel } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { IBotInteraction } from "../api/capi";
@@ -25,16 +25,18 @@ export default class announcement implements IBotInteraction {
         const commandBuilder = new SlashCommandBuilder();
         commandBuilder.setName(this.name());
         commandBuilder.setDescription(this.help());
-        commandBuilder.addStringOption({
-            name: 'topic',
-            description: 'Topic: ',
-            setRequired: true
-        });
-        commandBuilder.addStringOption({
-            name: 'body',
-            description: 'Body: ',
-            setRequired: true
-        });
+        commandBuilder.addStringOption(
+            (option: SlashCommandStringOption) =>
+		    option.setName('topic')
+			.setDescription('Topic: ').
+            setRequired(true)
+        );
+        commandBuilder.addStringOption(
+            (option: SlashCommandStringOption) =>
+		    option.setName('body')
+			.setDescription('Body: ').
+            setRequired(true)
+        );
         return commandBuilder;
     }
     
@@ -42,20 +44,24 @@ export default class announcement implements IBotInteraction {
         return 'teacher';
     }
 
-async runCommand(interaction: any, Bot: Client): Promise<void> {
+async runCommand(interaction: CommandInteraction, Bot: Client): Promise<void> {
     var role = interaction.guild!.roles.cache.find((role: Role) => role.name == 'Student') as Role;
     const channel: TextChannel = interaction.guild?.channels.cache.find((channel:any) => channel.name == 'announcements') as TextChannel;
-            interaction.reply({content:"Creating announcement...", ephemeral:true});
-            let embed: EmbedBuilder = new EmbedBuilder();
-            embed.setTitle("Announcement")
-            .setColor('Random')
-            .setDescription("This is an important message from your teacher.")
-            .addFields(interaction.options.getString("topic"),interaction.options.getString("body"))
-            .setThumbnail(interaction.user.displayAvatarURL)
-            .setTimestamp()
-            .setThumbnail(interaction.user.displayAvatarURL)
-            .setFooter({text: 'Powered by DisCourse'})
-            channel.send({content:`<@&${role.id}>`, embeds:[embed]});
-            
+        interaction.reply({content:"Creating announcement...", ephemeral:true});
+        if (!interaction.isChatInputCommand()) return;
+        let topic = interaction.options.getString("topic");
+        let body = interaction.options.getString("topic");
+        let embed: EmbedBuilder = new EmbedBuilder();
+        embed.setTitle("Announcement")
+        .setColor('Random')
+        .setDescription("This is an important message from your teacher.")
+        .addFields({
+            name: (topic ? topic : "Announcement"), 
+            value: (body ? body : "")
+        })
+        .setThumbnail(interaction.user.displayAvatarURL())
+        .setTimestamp()
+        .setFooter({text: 'Powered by DisCourse'})
+        channel.send({content:`<@&${role.id}>`, embeds:[embed]}); 
     }
 } //runcommand ends
