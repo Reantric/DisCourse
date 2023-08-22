@@ -1,19 +1,25 @@
-import * as Discord from "discord.js";
+import { Client, Guild, GuildMember } from 'discord.js';
+import { RoleManager, ChannelManager } from 'discord.js';
+import { Snowflake, Collection, ApplicationCommand } from 'discord.js';
+import { PermissionFlagsBits, GatewayIntentBits } from 'discord.js';
+import { GuildChannelTypes } from 'discord.js';
 import * as Config from "./config";
 var db = require('quick.db');
 import { IBotInteraction } from "./api/capi";
 import { IBotEvent } from "./api/eapi";
 var userBehavior = new db.table('user');
 var qid = new db.table('id');
-const myIntents = new Discord.Intents();
-myIntents.add(Discord.Intents.FLAGS.GUILDS,Discord.Intents.FLAGS.GUILD_MEMBERS,Discord.Intents.FLAGS.GUILD_MESSAGES);
-const Bot: Discord.Client = new Discord.Client({intents: myIntents});
-import { Permissions } from 'discord.js';
 
+const myIntents = [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages
+];
+const Bot: Client = new Client({intents: myIntents});
 
 import fs = require('fs');
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
+import { Routes } from 'discord-api-types/v10';
 //Required imports
 
 let commands: IBotInteraction[] = [];
@@ -21,16 +27,14 @@ let events: IBotEvent[] = [];
     
 //get all commands from directory name (arbitrary) and load them into commands which is of type IBotCommand
 
-
-const cooldowns: any = new Discord.Collection();
+const cooldowns: any = new Collection();
 
 //cooldowns is a object that takes a key-value pair and stores it in an array
-function randint(min: number,max: number) // min and max included
-{
-        return Math.floor(Math.random()*(max-min+1)+min);
+function randint(min: number,max: number) {
+    return Math.floor(Math.random()*(max-min+1)+min);
 }
 
-const vals = {
+const student = {
     questions: [],
     points:0,
     strikes:0,
@@ -41,84 +45,101 @@ const vals = {
 let studentID: string;
 let teacherID: string;
 
-async function init(guild: Discord.Guild){
-    await guild.roles.fetch();
-    await guild.channels.fetch();
-    await Bot.application?.fetch();
+/**
+ * Setup bot in new server
+ * @param guild
+ * @returns 
+ */
+async function init(guild: Guild) {
+    let roleManager: RoleManager = guild.roles;
+    let channelManager: ChannelManager = guild.channels;
 
-    if(!guild.roles.cache.some((role: any) => role.name === 'Teacher')){
-        await guild.roles.create({ name: 'Teacher', color: 'YELLOW',permissions: [
-            Permissions.FLAGS.ADMINISTRATOR
-        ] });
-    }
-    if(!guild.roles.cache.some((role: any) => role.name === 'Student')){
-        await guild.roles.create({ name: 'Student',color: 'RED', permissions: [
-            Permissions.FLAGS.VIEW_CHANNEL,
-            Permissions.FLAGS.ADD_REACTIONS,
-            Permissions.FLAGS.STREAM,
-            Permissions.FLAGS.SEND_MESSAGES,
-            Permissions.FLAGS.EMBED_LINKS,
-            Permissions.FLAGS.ATTACH_FILES,
-            Permissions.FLAGS.READ_MESSAGE_HISTORY,
-            Permissions.FLAGS.CONNECT,
-            Permissions.FLAGS.SPEAK ,
-            Permissions.FLAGS.USE_PUBLIC_THREADS,
-        ] });
+    //what does this do?
+    // await roleManager.fetch();
+    // await channelManager.fetch();
+    // await Bot.application?.fetch();
+
+    if (!roleManager.cache.some((role: any) => role.name === 'Teacher')) {
+        await roleManager.create({ name: 'Teacher', color: 'Yellow', permissions: [
+            PermissionFlagsBits.Administrator
+        ]});
     }
 
-    if(!guild.roles.cache.some((role: any) => role.name === 'Mute')){
-        await guild.roles.create({ name: 'Mute', color: 'GREEN', permissions: [
-            Permissions.FLAGS.READ_MESSAGE_HISTORY,
-            Permissions.FLAGS.VIEW_CHANNEL
+    if (!roleManager.cache.some((role: any) => role.name === 'Student')) {
+        await roleManager.create({ name: 'Student', color: 'Red', permissions: [
+            PermissionFlagsBits.ViewChannel,
+            PermissionFlagsBits.AddReactions,
+            PermissionFlagsBits.Stream,
+            PermissionFlagsBits.SendMessages,
+            PermissionFlagsBits.SendMessagesInThreads,
+            PermissionFlagsBits.EmbedLinks,
+            PermissionFlagsBits.AttachFiles,
+            PermissionFlagsBits.ReadMessageHistory,
+            PermissionFlagsBits.Connect,
+            PermissionFlagsBits.Speak ,
+            PermissionFlagsBits.CreatePublicThreads
+        ] });
+    }
+
+    if(!roleManager.cache.some((role: any) => role.name === 'Mute')){
+        await roleManager.create({ name: 'Mute', color: 'Green', permissions: [
+            PermissionFlagsBits.ReadMessageHistory,
+            PermissionFlagsBits.ViewChannel
         ] });
     }
     
 
-    studentID = guild.roles.cache.find(role => role.name == 'Student')?.id as string;
-    teacherID = guild.roles.cache.find(role => role.name == 'Teacher')?.id as string;
-    await Bot.guilds.cache.get('886326356072337438')?.commands.fetch().then((col: Discord.Collection<Discord.Snowflake,Discord.ApplicationCommand>) => {
+    studentID = roleManager.cache.find(role => role.name == 'Student')?.id as string;
+    teacherID = roleManager.cache.find(role => role.name == 'Teacher')?.id as string;
+    await Bot.guilds.cache.get('886326356072337438')?.commands.fetch()
+        .then((col: Collection<Snowflake, ApplicationCommand>) => {
         loadCommands(`${__dirname}/commands`,col);
         loadEvents(`${__dirname}/events`)
     })
     //This is a WIP
     // Consider using a for loop in case we decide to add new roles!
-    let teacherChannel = guild.channels.cache.some((channel) => channel.name == 'teacher');
+    let teacherChannel = channelManager.cache.some((channel) => channel.id == 'teacher');
     if (!teacherChannel)
-        guild.channels.create('teacher', {type: 'GUILD_TEXT', topic: 'DisCourse will send you info here.', permissionOverwrites:[
+        channelManager.create('teacher', {type: 'GUILD_TEXT', topic: 'DisCourse will send you info here.', 
+        permissionOverwrites:[
             {
                 id: studentID,
-                deny: Permissions.FLAGS.VIEW_CHANNEL,
+                deny: PermissionFlagsBits.ViewChannel,
                 type: "role"
             },
             {
-                id: guild.roles.everyone,
-                deny: Permissions.FLAGS.VIEW_CHANNEL,
+                id: roleManager.everyone,
+                deny: PermissionFlagsBits.ViewChannel,
                 type: "role"
             },
             {
                 id: teacherID,
-                allow: [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL]
+                allow: [
+                    PermissionFlagsBits.SendMessages, 
+                    PermissionFlagsBits.ViewChannel, 
+                    PermissionFlagsBits.ViewAuditLog
+                ]
             },
         ]});
 
-    let annChannel = guild.channels.cache.some((channel) => channel.name == 'announcements');
+    let annChannel = channelManager.cache.some((channel) => channel.name == 'announcements');
     if (!annChannel)
-        guild.channels.create('announcements', {type: 'GUILD_TEXT', topic: 'Messages from your teacher will go here!', permissionOverwrites:[
+        channelManager.create('announcements', {type: 'GUILD_TEXT', topic: 'Messages from your teacher will go here!', permissionOverwrites:[
             {
                 id: studentID,
-                deny: Permissions.FLAGS.SEND_MESSAGES,
-                allow: Permissions.FLAGS.VIEW_CHANNEL
+                deny: PermissionFlagsBits.SEND_MESSAGES,
+                allow: PermissionFlagsBits.VIEW_CHANNEL
             },
             {
                 id: teacherID,
-                allow: [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL]
+                allow: [PermissionFlagsBits.SEND_MESSAGES, PermissionFlagsBits.VIEW_CHANNEL]
             },
             {
-                id: guild.roles.everyone,
-                allow: Permissions.FLAGS.VIEW_CHANNEL,
+                id: roleManager.everyone,
+                allow: PermissionFlagsBits.VIEW_CHANNEL,
             }
         ]});
-        return await guild.roles.fetch(teacherID);
+        return await roleManager.fetch(teacherID);
 }
 
 Bot.once("ready", async () => {
@@ -128,10 +149,10 @@ Bot.once("ready", async () => {
     qid.set("id", 0);
     
     Bot.guilds.fetch().then(() => {
-        Bot.guilds.cache.forEach(async (guild: Discord.Guild) => {
+        Bot.guilds.cache.forEach(async (guild: Guild) => {
             let h1gh = await init(guild);
             guild.members.fetch().then((collection) => {
-                collection.forEach((member: Discord.GuildMember) => {
+                collection.forEach((member: GuildMember) => {
                     if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
                         db.set(member.id,vals)
                     }
@@ -148,7 +169,7 @@ Bot.on("guildMemberAdd", member => {
    if (!db.has(member.id)){ //if new member not in db, add them!
     db.set(member.id,vals)
    }
-   var role: any = member.guild.roles.cache.find(role => role.name == "Student");
+   var role: any = member.roleManager.cache.find(role => role.name == "Student");
    member.roles.add(role);
 })
 
