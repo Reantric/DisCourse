@@ -30,13 +30,11 @@ export default class ask implements IBotInteraction {
         const commandBuilder = new SlashCommandBuilder();
         commandBuilder.setName(this.name());
         commandBuilder.setDescription(this.help());
-        commandBuilder.addStringOption(
-        {
+        commandBuilder.addStringOption({
             name: 'question',
             description: 'Enter your question:',
             setRequired: true
-        }
-        );
+        });
         return commandBuilder
     }
 
