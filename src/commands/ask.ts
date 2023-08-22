@@ -32,7 +32,7 @@ export default class ask implements IBotInteraction {
         commandBuilder.setDescription(this.help());
         commandBuilder.addStringOption({
             name: 'question',
-            description: 'Enter your question:',
+            description: 'Enter your question: ',
             setRequired: true
         });
         return commandBuilder
