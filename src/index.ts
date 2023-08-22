@@ -7,10 +7,19 @@ import { PermissionFlagsBits, GatewayIntentBits } from 'discord.js';
 import { ChannelType, OverwriteType, ActivityType, ApplicationCommandPermissionType } from 'discord.js';
 import { RoleResolvable } from 'discord.js';
 import { Message } from 'discord.js';
-import * as Config from "./config";
-var db = require('quick.db');
+
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v10';
+
 import { IBotInteraction } from "./api/capi";
 import { IBotEvent } from "./api/eapi";
+
+import { setupInfo } from './setup';
+
+import {config} from 'dotenv';
+config();
+
+var db = require('quick.db');
 var userBehavior = new db.table('user');
 var qid = new db.table('id');
 
@@ -21,19 +30,11 @@ const myIntents = [
 ];
 const Bot: Client = new Client({intents: myIntents});
 
-import fs = require('fs');
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v10';
-//Required imports
-
 let commands: IBotInteraction[] = [];
 let events: IBotEvent[] = [];
-    
-//get all commands from directory name (arbitrary) and load them into commands which is of type IBotCommand
 
-const cooldowns: any = new Collection();
+const command_cooldowns: any = new Collection();
 
-//cooldowns is a object that takes a key-value pair and stores it in an array
 function randint(min: number,max: number) {
     return Math.floor(Math.random()*(max-min+1)+min);
 }
@@ -250,18 +251,18 @@ async function handleCommand(interaction: CommandInteraction){
             if (!commandClass.isThisInteraction(command) ){
                 continue;
             } //Checks IBotCommands (located in api.ts) for layout, if isThisCommand String is not equal to command, skip!
-            if (!cooldowns.has(commandClass.name())) { //if name String in capi.ts (IBotCommand) == to command
-                cooldowns.set(commandClass.name(), new Collection()); //store the command name and a obj key-val 
+            if (!command_cooldowns.has(commandClass.name())) { //if name String in capi.ts (IBotCommand) == to command
+                command_cooldowns.set(commandClass.name(), new Collection()); //store the command name and a obj key-val 
             }
             
             const now = Date.now();
-            const timestamps = cooldowns.get(commandClass.name()); //whatever is in the Discord.Collection, yeah thats timestamps now!
+            const timestamps = command_cooldowns.get(commandClass.name()); //whatever is in the Discord.Collection, yeah thats timestamps now!
             const cooldownAmount = (commandClass.cooldown() || 3) * 1000; //from ms to sec
             //Begins the cooldown command process!
             if (timestamps.has(interaction.member?.user.id)) { //checks to see if user in col
                 const expirationTime: number = timestamps.get(interaction.member?.user.id) + cooldownAmount; //expiration is time assigned to user + cooldownAmt
             
-                if (now < expirationTime) { // This code is absolutely abysmal, my god
+                if (now < expirationTime) { // This code is absolutely abysmal, my god a pizza pasta
                     const timeLeft = (expirationTime - now) / 1000;
                     if (timeLeft > 3600){
                         return interaction.reply({ephemeral: true, content: `please wait ${Math.round(timeLeft/3600)} more hour(s) before reusing the \`${commandClass.name()}\` command.`});
@@ -300,19 +301,19 @@ export class HelpUtil {
 export const helpUtil = new HelpUtil();
 
 function loadCommands(commandsPath: string, allSlashCommands: Collection<Snowflake, ApplicationCommand>){
-    if (!Config.config.commands || (Config.config.commands as string[]).length == 0) return; //goes into config.ts and reads the commands, checks if they are valid
+    if (!setupInfo.commands || (setupInfo.commands as string[]).length == 0) return;
     
     let commandDatas: any[] = [];
-    for (const commandName of Config.config.commands as string[]){ //turns commands in config.ts into a string array and iterates over them
-        const commandsClass = require(`${commandsPath}/${commandName}`).default; //imports the command file (default=ts) from file directory
-        const command = new commandsClass() as IBotInteraction; //command now follows same layout as IBotCommand in form commandsClass(), created new object
+    for (const commandName of setupInfo.commands as string[]) {
+        const commandsClass = require(`${commandsPath}/${commandName}`).default;
+        const command = new commandsClass() as IBotInteraction;
         helpUtil.add(command.name(),command.help(),command.perms());
-        commands.push(command); //adds commands to command array
+        commands.push(command);
         commandDatas.push(command.data().toJSON())
         const permCommand = allSlashCommands.find((com) => com.name == command.name());
         let xd: string;
         let complementxd: string;
-        switch (command.perms()){
+        switch (command.perms()) {
             case 'student':
                 xd = studentID
                 complementxd = teacherID;
@@ -342,20 +343,20 @@ function loadCommands(commandsPath: string, allSlashCommands: Collection<Snowfla
 
             permCommand?.permissions.add({
                 permissions,
-                token: Config.config.token
+                token: process.env.TOKEN!
             });
 
         }
     }
 
-    const rest: any = new REST({ version: '10' }).setToken(Config.config.token);
+    const rest: any = new REST({ version: '10' }).setToken(process.env.TOKEN!);
 
      (async () => {
         try {
             console.log('Started refreshing application (/) commands.');
 
             await rest.put(
-                Routes.applicationGuildCommands(Config.config.clientID, Config.config.guildID),
+                Routes.applicationGuildCommands(setupInfo.clientID, setupInfo.guildID),
                 { body: commandDatas },
             );
 
@@ -367,9 +368,9 @@ function loadCommands(commandsPath: string, allSlashCommands: Collection<Snowfla
 }
 
 function loadEvents(commandsPath: string){
-    if (!Config.config.events || (Config.config.events as string[]).length == 0) return; 
+    if (!setupInfo.events || (setupInfo.events as string[]).length == 0) return; 
 
-    for (const eventName of Config.config.events as string[]){ //turns events in config.ts into a string array and iterates over them
+    for (const eventName of setupInfo.events as string[]){ //turns events in config.ts into a string array and iterates over them
         const eventsClass = require(`${commandsPath}/${eventName}`).default; //imports the event file (default=ts) from file directory
 
         const event = new eventsClass() as IBotEvent; //command now follows same layout as IBotCommand in form commandsClass(), created new object
@@ -377,4 +378,4 @@ function loadEvents(commandsPath: string){
     }
 }
 
-Bot.login(Config.config.token); //logs in using token in config.config (not accessible to you)
+Bot.login(process.env.TOKEN!);
