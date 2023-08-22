@@ -22,15 +22,25 @@ export default class announcement implements IBotInteraction {
         return this.aliases.includes(command);
     }
     data(): any {
-    return new SlashCommandBuilder()
-    .setName(this.name())
-    .setDescription(this.help())
-        .addStringOption((option: any) => option.setName('topic').setDescription('Topic: ').setRequired(true))
-        .addStringOption((option: any) => option.setName('body').setDescription('Body: ').setRequired(true))
-}
-perms(): "teacher" | "student" | "both" {
-    return 'teacher';
- }
+        const commandBuilder = new SlashCommandBuilder();
+        commandBuilder.setName(this.name());
+        commandBuilder.setDescription(this.help());
+        commandBuilder.addStringOption({
+            name: 'topic',
+            description: 'Topic: ',
+            setRequired: true
+        });
+        commandBuilder.addStringOption({
+            name: 'body',
+            description: 'Body: ',
+            setRequired: true
+        });
+        return commandBuilder;
+    }
+    
+    perms(): "teacher" | "student" | "both" {
+        return 'teacher';
+    }
 
 async runCommand(interaction: any, Bot: Client): Promise<void> {
     var role = interaction.guild!.roles.cache.find((role: Role) => role.name == 'Student') as Role;
