@@ -1,12 +1,5 @@
-import { Client, Guild, GuildMember, PermissionsBitField, Role } from 'discord.js';
-import { RoleManager, GuildChannelManager } from 'discord.js';
 import { ApplicationCommand, ApplicationCommandPermissions } from 'discord.js';
-import { Interaction, CommandInteraction } from 'discord.js';
-import { Snowflake, Collection } from 'discord.js';
-import { PermissionFlagsBits, GatewayIntentBits } from 'discord.js';
-import { ChannelType, OverwriteType, ActivityType, ApplicationCommandPermissionType } from 'discord.js';
-import { RoleResolvable } from 'discord.js';
-import { Message } from 'discord.js';
+import { ApplicationCommandPermissionType } from 'discord.js';
 
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
@@ -20,21 +13,11 @@ import {config} from 'dotenv';
 
 config();
 
-
 let events: IBotEvent[] = [];
-const command_cooldowns: any = new Collection();
+const rest: REST = new REST().setToken(process.env.TOKEN!);
 
 refreshCommands()
 loadEvents(`${__dirname}/events`);
-
-const rest: REST = new REST().setToken(process.env.TOKEN!);
-
-// updateCommandPermissions(rest);
-
-async function updateCommandPermissions(rest: REST) {
-    // const commandInformation = await rest.get(Routes.applicationCommandPermissions(process.env.CLIENT_ID!, setupInfo.guildID));
-    // console.log(commandInformation);
-}
 
 function loadCommands(commandsPath: string): Map<string, IBotInteraction> | null {
     let commands: Map<string, IBotInteraction> = new Map();
