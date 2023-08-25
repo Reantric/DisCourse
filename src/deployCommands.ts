@@ -13,11 +13,9 @@ import {config} from 'dotenv';
 
 config();
 
-let events: IBotEvent[] = [];
 const rest: REST = new REST().setToken(process.env.TOKEN!);
 
-refreshCommands()
-loadEvents(`${__dirname}/events`);
+refreshCommands();
 
 function loadCommands(commandsPath: string): Map<string, IBotInteraction> | null {
     let commands: Map<string, IBotInteraction> = new Map();
@@ -38,7 +36,13 @@ async function sendCommands(commands: Map<string, IBotInteraction>): Promise<App
         let applicationCommands : ApplicationCommand[] = await rest.put(
             Routes.applicationCommands(process.env.CLIENT_ID!),
             { 
-                body: Array.from(commands.values()).map((command) => command.data().json())
+                body: Array.from(commands.values()).map((command) => command.data().toJSON())
+            },
+        ) as ApplicationCommand[];
+        await rest.put(
+            Routes.applicationGuildCommands(process.env.CLIENT_ID!, setupInfo.guildID),
+            { 
+                body: []
             },
         ) as ApplicationCommand[];
         return applicationCommands;
@@ -51,8 +55,8 @@ async function sendCommands(commands: Map<string, IBotInteraction>): Promise<App
 function setCommandPermissions(applicationCommands: ApplicationCommand[], commandMap: Map<string, IBotInteraction>) {
     for (let command of applicationCommands) {
         let commandObject = commandMap.get(command.name);
-
-        if (commandObject!.perms() == 'both') continue;
+        if (!commandObject) return;
+        if (commandObject.perms() == 'both') continue;
         let acceptRole = commandObject!.perms() == 'student' ? 'student' : 'teacher';
         let denyRole = commandObject!.perms() == 'teacher' ? 'student' : 'teacher';
         const permissionData: ApplicationCommandPermissions[] = [{
@@ -77,16 +81,4 @@ async function refreshCommands() {
     if (!commands) return;
     let commandObjects = await sendCommands(commands);
     setCommandPermissions(commandObjects, commands);
-}
-
-function loadEvents(commandsPath: string){
-    let eventList = setupInfo.events as string[];
-
-    if (!eventList || eventList.length == 0) return; 
-
-    for (const eventName of eventList){ //turns events in config.ts into a string array and iterates over them
-        const EventsClass = require(`${commandsPath}/${eventName}`).default;
-        const event = new EventsClass() as IBotEvent;
-        events.push(event);
-    }
 }

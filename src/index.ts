@@ -8,9 +8,6 @@ import { ChannelType, OverwriteType, ActivityType, ApplicationCommandPermissionT
 import { RoleResolvable } from 'discord.js';
 import { Message } from 'discord.js';
 
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v10';
-
 import { IBotInteraction } from "./api/capi";
 import { IBotEvent } from "./api/eapi";
 
@@ -93,17 +90,12 @@ async function init(guild: Guild) {
             PermissionFlagsBits.ViewChannel
         ] });
     }
-    
 
     studentID = roleManager.cache.find(role => role.name == 'Student')?.id as string;
     teacherID = roleManager.cache.find(role => role.name == 'Teacher')?.id as string;
 
-    
-    await Bot.guilds.cache.get(setupInfo.guildID)?.commands.fetch()
-        .then((collection: Collection<Snowflake, ApplicationCommand>) => {
-        loadCommands(`${__dirname}/commands`, collection);
-        loadEvents(`${__dirname}/events`)
-    })
+    loadCommands(`${__dirname}/commands`);
+    loadEvents(`${__dirname}/events`);
 
     //This is a WIP
     // Consider using a for loop in case we decide to add new roles!
@@ -248,16 +240,14 @@ async function handleEvent(msg: Message){
 
 async function handleCommand(interaction: CommandInteraction){
     let command = interaction.commandName;
-    let args: any = []//msg.content.split(" ").slice(1);
-    //Make command and args lowercase
 
     for (const commandClass of commands){
         try {
             if (!commandClass.isThisInteraction(command) ){
                 continue;
-            } //Checks IBotCommands (located in api.ts) for layout, if isThisCommand String is not equal to command, skip!
-            if (!commandCooldowns.has(commandClass.name())) { //if name String in capi.ts (IBotCommand) == to command
-                commandCooldowns.set(commandClass.name(), new Collection()); //store the command name and a obj key-val 
+            }
+            if (!commandCooldowns.has(commandClass.name())) {
+                commandCooldowns.set(commandClass.name(), new Collection());
             }
             
             const now = Date.now();
@@ -294,8 +284,8 @@ export class HelpUtil {
         this.helpMap = new Map();
     }
 
-    add(name: string,help: string,perms: "student" | "teacher" | "both"){
-        this.helpMap.set(name,[help,perms]);
+    add(name: string, description: string, perms: "student" | "teacher" | "both"){
+        this.helpMap.set(name, [description, perms]);
     }
 
     get(){
@@ -305,86 +295,28 @@ export class HelpUtil {
 
 export const helpUtil = new HelpUtil();
 
-function loadCommands(commandsPath: string, allSlashCommands: Collection<Snowflake, ApplicationCommand>){
-    console.log("Function called");
+function loadCommands(commandsPath: string){
     if (!setupInfo.commands || (setupInfo.commands as string[]).length == 0) return;
-    
-    let commandDatas: any[] = [];
     for (const commandName of setupInfo.commands as string[]) {
         const commandsClass = require(`${commandsPath}/${commandName}`).default;
         const command = new commandsClass() as IBotInteraction;
-        helpUtil.add(command.name(),command.help(),command.perms());
         commands.push(command);
-        commandDatas.push(command.data().toJSON())
-        const permCommand = allSlashCommands.find((com) => com.name == command.name());
-        let xd: string;
-        let complementxd: string;
-        switch (command.perms()) {
-            case 'student':
-                xd = studentID
-                complementxd = teacherID;
-                break;
-            case 'teacher':
-                xd = teacherID
-                complementxd = studentID;
-                break;
-            default:
-                xd = ''
-                complementxd = ''
-        }
-        //console.log(xd,command.name(), command.perms());
-        if (xd != ''){
-            const permissions: ApplicationCommandPermissions[] = [
-                {
-                    id: xd,
-                    type: ApplicationCommandPermissionType.Role,
-                    permission: true,
-                },
-                {
-                    id: complementxd,
-                    type: ApplicationCommandPermissionType.Role,
-                    permission: false,
-                },
-            ];
-
-            permCommand?.permissions.add({
-                permissions,
-                token: process.env.TOKEN!
-            });
-
-        }
+        helpUtil.add(command.name(), command.help(), command.perms());
     }
-
-    const rest: any = new REST().setToken(process.env.TOKEN!);
-
-    const sendCommands = (async () => {
-        console.log("Running")
-        try {
-            console.log('Started refreshing application (/) commands.');
-
-            await rest.put(
-                Routes.applicationGuildCommands(process.env.CLIENT_ID!, setupInfo.guildID),
-                { body: commandDatas },
-            );
-
-            console.log('Successfully reloaded application (/) commands.');
-        } catch (error) {
-            console.error(error);
-        }
-    });
-    sendCommands();
 }
 
-function loadEvents(commandsPath: string){
-    if (!setupInfo.events || (setupInfo.events as string[]).length == 0) return; 
+function loadEvents(commandsPath: string): IBotEvent[] {
+    let eventList = setupInfo.events as string[];
 
-    for (const eventName of setupInfo.events as string[]){ //turns events in config.ts into a string array and iterates over them
-        const eventsClass = require(`${commandsPath}/${eventName}`).default; //imports the event file (default=ts) from file directory
+    if (!eventList || eventList.length == 0) return []; 
 
-        const event = new eventsClass() as IBotEvent; //command now follows same layout as IBotCommand in form commandsClass(), created new object
-        events.push(event); //adds event to events array
+    for (const eventName of eventList){ //turns events in config.ts into a string array and iterates over them
+        const EventsClass = require(`${commandsPath}/${eventName}`).default;
+        const event = new EventsClass() as IBotEvent;
+        events.push(event);
     }
-    console.log('done');
+
+    return events;
 }
-console.log('here');
+
 Bot.login(process.env.TOKEN!);
