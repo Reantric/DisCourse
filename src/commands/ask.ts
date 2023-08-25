@@ -42,9 +42,9 @@ export default class ask implements IBotInteraction {
     }
 
     async runCommand(interaction: any, Bot: Client): Promise<void> {
-        var id = questionId.get("id");
+        var id = await questionId.get("id");
         id = id.toString();
-        questionId.set("id", questionId.get("id") + 1);
+        await questionId.set("id", await questionId.get("id") + 1);
         let role = interaction.guild!.roles.cache.find((role: Role) => role.name == 'Student') as Role;
         const question = new EmbedBuilder();
         question.setTitle("Your classmate has a question!")
@@ -55,9 +55,9 @@ export default class ask implements IBotInteraction {
         .setFooter({text: `Question ID: ${id}`})
         .setTimestamp();
         let msgid = "";
-        interaction.channel.send({content:`<@&${role!.id}>`,embeds:[question]}).then((message:any) => {
+        interaction.channel.send({content:`<@&${role!.id}>`,embeds:[question]}).then(async (message:any) => {
             msgid = message.id;
-            questionInfo.set(id,[msgid,interaction.member.user.id]);
+            await questionInfo.set(id,[msgid,interaction.member.user.id]);
         }).catch((error:Error) => console.log(error));
         interaction.reply({content:`Your question was sent!`, ephemeral: true});
     }

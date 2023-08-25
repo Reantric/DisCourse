@@ -50,7 +50,7 @@ async runCommand(interaction: CommandInteraction, Bot: Client): Promise<void> {
         interaction.reply({content:"Creating announcement...", ephemeral:true});
         if (!interaction.isChatInputCommand()) return;
         let topic = interaction.options.getString("topic");
-        let body = interaction.options.getString("topic");
+        let body = interaction.options.getString("body");
         let embed: EmbedBuilder = new EmbedBuilder();
         embed.setTitle("Announcement")
         .setColor('Random')

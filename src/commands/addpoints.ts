@@ -39,7 +39,7 @@ perms(): "teacher" | "student" | "both" {
 async runCommand(interaction: any, Bot: Discord.Client): Promise<void> {
     const int1 = interaction.options.getInteger('points')
     const user = interaction.options.getMember('target');
-    db.add(`${user.id}.points`,int1)
+    await db.add(`${user.id}.points`,int1)
     interaction.reply({content: `You added ${int1} point(s) to ${user}.`, ephemeral:true});
 }
 }

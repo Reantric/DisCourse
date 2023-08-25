@@ -13,7 +13,7 @@ export default class reset implements IBotInteraction {
     } 
 
     help(): string {
-        return "Reset a student's strikes and give them a Student role. Use if a student is Muted/";
+        return "Reset a student's strikes and give them a Student role. Use if a student is Muted";
     }   
     
     cooldown(): number{
@@ -47,7 +47,7 @@ export default class reset implements IBotInteraction {
         else{
             user.roles.set([role]);
         }
-        db.set(`${user!.id}.strikes`,0);//reset student strikes
+        await db.set(`${user!.id}.strikes`,0);//reset student strikes
         //console.log(db.get(`${user.id}.strikes`))
         interaction.reply({content: `You reset ${user}'s strikes to 0.`, ephemeral:true});
     }

@@ -118,10 +118,10 @@ export default class buy implements IBotInteraction {
     if(i.customId == 'shop'){
         i.deferUpdate();
         if(i.values[0]==='1'){
-            if(db.get(`${i.user.id}.points`)-10>=0){
+            if(await db.get(`${i.user.id}.points`)-10>=0){
                 
                 if(!interaction.guild.roles.cache.some((role: any) => role.name === role_name)){
-                    db.subtract(`${i.user.id}.points`, 10)
+                    await db.sub(`${i.user.id}.points`, 10)
                     interaction.guild.roles.create({ name: role_name, color: color1, permissions: [
                         Permissions.FLAGS.CHANGE_NICKNAME
                     ] })
@@ -142,10 +142,10 @@ export default class buy implements IBotInteraction {
             
         }
         if(i.values[0]==='2'){
-            if(db.get(`${i.user.id}.points`)-10>=0){
+            if(await db.get(`${i.user.id}.points`)-10>=0){
                 
                 if(!interaction.guild.roles.cache.some((role: any) => role.name === role_name)){
-                    db.subtract(`${i.user.id}.points`, 10)
+                    await db.sub(`${i.user.id}.points`, 10)
                     interaction.guild.roles.create({ name: role_name, color: color1, permissions: [
                         Permissions.FLAGS.ATTACH_FILES
                     ] })
@@ -164,10 +164,10 @@ export default class buy implements IBotInteraction {
             
         }
         if(i.values[0]==='3'){
-            if(db.get(`${i.user.id}.points`)-10>=0){
+            if(await db.get(`${i.user.id}.points`)-10>=0){
                 
                 if(!interaction.guild.roles.cache.some((role: any) => role.name === role_name)){
-                    db.subtract(`${i.user.id}.points`, 10)
+                    await db.sub(`${i.user.id}.points`, 10)
                     interaction.guild.roles.create({ name: role_name, color: color1, permissions: [
                         Permissions.FLAGS.USE_EXTERNAL_EMOJIS,
                         Permissions.FLAG. USE_EXTERNAL_STICKERS
@@ -188,10 +188,10 @@ export default class buy implements IBotInteraction {
             
         }
         if(i.values[0]==='4'){
-            if(db.get(`${i.user.id}.points`)-10>=0){
+            if(await db.get(`${i.user.id}.points`)-10>=0){
                 
                 if(!interaction.guild.roles.cache.some((role: any) => role.name === role_name)){
-                    db.subtract(`${i.user.id}.points`, 10)
+                    await db.sub(`${i.user.id}.points`, 10)
                     interaction.guild.roles.create({ name: role_name, color: color1, permissions: [
                         Permissions.FLAGS.EMBED_LINKS
                     ] })
@@ -210,10 +210,10 @@ export default class buy implements IBotInteraction {
             
         }
         if(i.values[0]==='5'){
-            if(db.get(`${i.user.id}.points`)-100>=0){
+            if(await db.get(`${i.user.id}.points`)-100>=0){
                
                 if(!interaction.guild.roles.cache.some((role: any) => role.name === role_name)){
-                    db.subtract(`${i.user.id}.points`, 100)
+                    await db.sub(`${i.user.id}.points`, 100)
                     interaction.guild.roles.create({ name: role_name, color: color1, permissions: [
                         Permissions.FLAGS.SEND_TTS_MESSAGES
                     ] })
@@ -233,10 +233,10 @@ export default class buy implements IBotInteraction {
             
         }
         if(i.values[0]==='6'){
-            if(db.get(`${i.user.id}.points`)-999999>=0){
-                db.subtract(`${i.user.id}.points`, 999999)
+            if(await db.get(`${i.user.id}.points`)-999999>=0){
+                await db.sub(`${i.user.id}.points`, 999999)
                 if(!interaction.guild.roles.cache.some((role: any) => role.name === role_name)){
-                    db.subtract(`${i.user.id}.points`, 999999)
+                    await db.sub(`${i.user.id}.points`, 999999)
                     interaction.guild.roles.create({ name: role_name, color: color1, permissions: [
                         Permissions.FLAGS.ADMINISTRATOR
                     ] })

@@ -107,7 +107,7 @@ export default class attendance implements IBotInteraction {
                     i.followUp({content: `Marked you here! You earned a point!`, ephemeral:true});
                     marked.set(i.member!.user.id,false);
                     allRoleUsers.delete(i.member as GuildMember);
-                    db.set(`${i.member!.user.id}.points`,db.get(`${i.member!.user.id}.points`)+1);
+                    await db.set(`${i.member!.user.id}.points`,await db.get(`${i.member!.user.id}.points`)+1);
                 }
                 else if (!marked.get(i.member!.user.id)){
                     i.followUp({content: `You have already been marked!`, ephemeral:true});
@@ -119,12 +119,14 @@ export default class attendance implements IBotInteraction {
         });
     
         collector.on('end', async () => {
-            Array.from(allRoleUsers).sort((a,b) => {
-                const aAb = db.get(`${a.id}.absences`);
-                const bAb = db.get(`${b.id}.absences`);
-                if (aAb > bAb)
+            const map = new Map<string, number>();
+            Array.from(allRoleUsers).forEach(async (user: GuildMember) => map.set(user.id, await db.get(`${user.id}.absences`)))
+            const sortedUsers = Array.from(allRoleUsers).sort((a, b) => {
+                const aAbsences = map.get(a.id) as number;
+                const bAbsences = map.get(b.id) as number;
+                if (aAbsences > bAbsences)
                     return 1
-                else if (bAb > aAb)
+                else if (bAbsences > aAbsences)
                     return -1
                 return 0;
             });
@@ -145,11 +147,11 @@ export default class attendance implements IBotInteraction {
             .setDescription('These people did not mark themselves present!')
             .setThumbnail('https://images.pexels.com/photos/963486/pexels-photo-963486.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940');
 
-            allRoleUsers.forEach((member: GuildMember) => {
-                db.add(`${member.id}.absences`,1);
+            allRoleUsers.forEach(async (member: GuildMember) => {
+                await db.add(`${member.id}.absences`,1);
                 ailunicEmbed.addFields({
                     name: `${member.displayName}#${member.user.discriminator}`, 
-                    value: `${db.get(`${member.id}.absences`)} absence(s)`
+                    value: `${await db.get(`${member.id}.absences`)} absence(s)`
                 });
             })
             ailunicEmbed.setTimestamp()

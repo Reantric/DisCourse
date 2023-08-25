@@ -48,13 +48,13 @@ export default class strike implements IBotInteraction {
             return;
         }
         else{
-            db.add(`${user!.id}.strikes`,1);//else strike student
-            db.set(`${user.id}.points`,Math.max(0,db.get(`${user.id}.points`)-2));
+            await db.add(`${user!.id}.strikes`,1);//else strike student
+            await db.set(`${user.id}.points`,Math.max(0, await db.get(`${user.id}.points`)-2));
         }
 
-        if(db.get(`${user.id}.strikes`)>=3){//if a student has at least three strikes then given the Mute role
+        if(await db.get(`${user.id}.strikes`)>=3){//if a student has at least three strikes then given the Mute role
             if(user.roles.cache.some((role:any) => role.name === 'Mute')){
-                interaction.reply({content: `This user has already been muted, but a strike was still added. This student now has ${db.get(`${user.id}.strikes`)} strike(s)`, ephemeral:true})
+                interaction.reply({content: `This user has already been muted, but a strike was still added. This student now has ${await db.get(`${user.id}.strikes`)} strike(s)`, ephemeral:true})
                 return;
             }
             else{
@@ -63,7 +63,7 @@ export default class strike implements IBotInteraction {
             
         }
         console.log('struck')
-        console.log(db.get(`${user.id}.strikes`))
-        interaction.reply({content: `You struck ${user}. This student now has ${db.get(`${user.id}.strikes`)} strike(s)`, ephemeral:true});
+        console.log(await db.get(`${user.id}.strikes`))
+        interaction.reply({content: `You struck ${user}. This student now has ${await db.get(`${user.id}.strikes`)} strike(s)`, ephemeral:true});
     }
 }

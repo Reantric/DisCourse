@@ -1,4 +1,4 @@
-import { Client, Guild, GuildMember, Role } from 'discord.js';
+import { Client, Guild, GuildMember, PermissionsBitField, Role } from 'discord.js';
 import { RoleManager, GuildChannelManager } from 'discord.js';
 import { ApplicationCommand, ApplicationCommandPermissions } from 'discord.js';
 import { Interaction, CommandInteraction } from 'discord.js';
@@ -34,7 +34,7 @@ const botIntents = [
 const Bot: Client = new Client({intents: botIntents});
 let commands: IBotInteraction[] = [];
 let events: IBotEvent[] = [];
-const command_cooldowns: any = new Collection();
+const commandCooldowns: any = new Collection();
 
 function randint(min: number,max: number) {
     return Math.floor(Math.random()*(max-min+1)+min);
@@ -97,12 +97,14 @@ async function init(guild: Guild) {
 
     studentID = roleManager.cache.find(role => role.name == 'Student')?.id as string;
     teacherID = roleManager.cache.find(role => role.name == 'Teacher')?.id as string;
-    console.log("before fetch")
+
+    
     await Bot.guilds.cache.get(setupInfo.guildID)?.commands.fetch()
         .then((collection: Collection<Snowflake, ApplicationCommand>) => {
         loadCommands(`${__dirname}/commands`, collection);
         loadEvents(`${__dirname}/events`)
     })
+
     //This is a WIP
     // Consider using a for loop in case we decide to add new roles!
     let teacherChannel = channelManager.cache.some((channel) => channel.name == 'teacher');
@@ -180,11 +182,12 @@ Bot.once("ready", async () => {
     
     Bot.guilds.fetch().then(() => {
         Bot.guilds.cache.forEach(async (guild: Guild) => {
+            if (!guild.members.me!.permissions.has(PermissionsBitField.Flags.Administrator)) return;
             let teacherRole = await init(guild);
             guild.members.fetch().then((collection) => {
-                collection.forEach((member: GuildMember) => {
-                    if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
-                        db.set(member.id, student)
+                collection.forEach(async (member: GuildMember) => {
+                    if (!(await db.has(member.id))){ 
+                        await db.set(member.id, student)
                     }
                     if (!member.roles.cache.has(teacherID) && !member.roles.cache.has(studentID))
                         member.roles.add([teacherRole as RoleResolvable]);
@@ -195,9 +198,9 @@ Bot.once("ready", async () => {
     })
     })
 
-Bot.on("guildMemberAdd", member => {
-   if (!db.has(member.id)){ //if new member not in db, add them!
-    db.set(member.id, student)
+Bot.on("guildMemberAdd", async member => {
+   if (!await db.has(member.id)){ //if new member not in db, add them!
+    await db.set(member.id, student)
    }
    var role: any = member.guild.roles.cache.find(role => role.name == "Student");
    member.roles.add(role);
@@ -220,9 +223,9 @@ Bot.on("messageCreate", msg => {
 Bot.on("guildCreate",async guild => {
     let teacherRole = await init(guild);
     guild.members.fetch().then((collection) => {
-        collection.forEach((member: GuildMember) => {
-            if (!db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
-                db.set(member.id, student)
+        collection.forEach(async (member: GuildMember) => {
+            if (!await db.has(member.id)){ //if User ID is not already in database (db) then add them, else do nothing
+                await db.set(member.id, student)
             }
             if (!member.roles.cache.has(teacherID) && !member.roles.cache.has(studentID))
                 member.roles.add([teacherRole as RoleResolvable]);
@@ -231,12 +234,12 @@ Bot.on("guildCreate",async guild => {
 })
 
 async function handleEvent(msg: Message){
-    let arr=db.get(`${msg.author.id}.messages`)
+    let arr=await db.get(`${msg.author.id}.messages`)
     if (arr.length < 10){ // if not full
-        db.push(`${msg.author.id}.messages`,msg.content);
+        await db.push(`${msg.author.id}.messages`,msg.content);
     }
     else {
-        db.set(`${msg.author.id}.messages`,[])
+        await db.set(`${msg.author.id}.messages`,[])
     }
     for (const eventClass of events){
         await eventClass.runEvent(msg,Bot);
@@ -253,12 +256,12 @@ async function handleCommand(interaction: CommandInteraction){
             if (!commandClass.isThisInteraction(command) ){
                 continue;
             } //Checks IBotCommands (located in api.ts) for layout, if isThisCommand String is not equal to command, skip!
-            if (!command_cooldowns.has(commandClass.name())) { //if name String in capi.ts (IBotCommand) == to command
-                command_cooldowns.set(commandClass.name(), new Collection()); //store the command name and a obj key-val 
+            if (!commandCooldowns.has(commandClass.name())) { //if name String in capi.ts (IBotCommand) == to command
+                commandCooldowns.set(commandClass.name(), new Collection()); //store the command name and a obj key-val 
             }
             
             const now = Date.now();
-            const timestamps = command_cooldowns.get(commandClass.name()); //whatever is in the Discord.Collection, yeah thats timestamps now!
+            const timestamps = commandCooldowns.get(commandClass.name()); //whatever is in the Discord.Collection, yeah thats timestamps now!
             const cooldownAmount = (commandClass.cooldown() || 3) * 1000; //from ms to sec
             //Begins the cooldown command process!
             if (timestamps.has(interaction.member?.user.id)) { //checks to see if user in col
@@ -352,17 +355,17 @@ function loadCommands(commandsPath: string, allSlashCommands: Collection<Snowfla
         }
     }
 
-    //const rest: any = new REST({ version: '10' }).setToken(process.env.TOKEN!);
+    const rest: any = new REST().setToken(process.env.TOKEN!);
 
     const sendCommands = (async () => {
         console.log("Running")
         try {
             console.log('Started refreshing application (/) commands.');
 
-            // await rest.put(
-            //     Routes.applicationGuildCommands(process.env.CLIENT_ID!, setupInfo.guildID),
-            //     { body: commandDatas },
-            // );
+            await rest.put(
+                Routes.applicationGuildCommands(process.env.CLIENT_ID!, setupInfo.guildID),
+                { body: commandDatas },
+            );
 
             console.log('Successfully reloaded application (/) commands.');
         } catch (error) {

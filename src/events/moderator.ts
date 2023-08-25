@@ -17,26 +17,25 @@ export default class moderator implements IBotEvent {
     
     
     async runEvent(msg: Discord.Message, Bot: Discord.Client): Promise<void> {
-        let arr = db.get(`${msg.author.id}.messages`);
-        console.log(arr);
+        let arr = await db.get(`${msg.author.id}.messages`);
         let allMessages: string = arr.join('');
         
         for(let i=0; i<forbiddenWords.length;i++){
           if(allMessages.includes(forbiddenWords[i])){
             if(msg.member!.roles.cache.some((role:any) => role.name === 'Student')){
-                  db.add(`${msg.author.id}.strikes`,1);
-                  db.set(`${msg.author.id}.points`,Math.max(0,db.get(`${msg.author.id}.points`)-2));
+                  await db.add(`${msg.author.id}.strikes`,1);
+                  await db.set(`${msg.author.id}.points`,Math.max(0,await db.get(`${msg.author.id}.points`)-2));
                   
-                msg.author.send(`Watch your mouth! You now have ${db.get(`${msg.author.id}.strikes`)} strike(s)! Reach 3 and you will be muted.`)
-                db.set(`${msg.author.id}.messages`, [])
+                msg.author.send(`Watch your mouth! You now have ${await db.get(`${msg.author.id}.strikes`)} strike(s)! Reach 3 and you will be muted.`)
+                await db.set(`${msg.author.id}.messages`, [])
               }
               else{
                 msg.author.send(`You used a banned word, but you're off the hook because you're a teacher.`)
-                db.set(`${msg.author.id}.messages`, [])
+                await db.set(`${msg.author.id}.messages`, [])
               }
           }
         }
-        let strikeAmount = db.get(`${msg.author!.id}.strikes`);
+        let strikeAmount = await db.get(`${msg.author!.id}.strikes`);
           if(strikeAmount>=3){
             try {
             var role: any = msg.guild!.roles.cache.find(role => role.name == 'Mute');
@@ -48,7 +47,7 @@ export default class moderator implements IBotEvent {
             }
           } catch (error){
             console.error(error);
-            db.set(`${msg.author.id}.messages`, [])
+            await db.set(`${msg.author.id}.messages`, [])
           }
             
           }

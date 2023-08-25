@@ -32,7 +32,7 @@ export default class profile implements IBotInteraction {
         return 'both';
     }
 
-    private formatProfileEmbed(user: User) {
+    private async formatProfileEmbed(user: User) {
         const embed = new EmbedBuilder();
         embed.setTitle(`${user.username}'s Profile`)
         .setDescription(`Here is ${user.username}'s info!`)
@@ -40,17 +40,17 @@ export default class profile implements IBotInteraction {
         .setColor('Random')
         .addFields({
             name: 'Points',
-            value: `**${db.get(`${user.id}.points`)}**`,
+            value: `**${await db.get(`${user.id}.points`)}**`,
             inline: true
         })
         .addFields({
             name: 'Strikes',
-            value: `**${db.get(`${user.id}.strikes`)}**`,
+            value: `**${await db.get(`${user.id}.strikes`)}**`,
             inline: true
         })
         .addFields({
             name: 'Absences',
-            value: `**${db.get(`${user.id}.absences`)}**`,
+            value: `**${await db.get(`${user.id}.absences`)}**`,
             inline: true
         })
         .setThumbnail(user.avatarURL()!)
@@ -66,8 +66,8 @@ export default class profile implements IBotInteraction {
             if (!user) {
                 user = interaction.user;
             }
-            const embed = this.formatProfileEmbed(user);
-            await interaction.reply({ 
+            const embed = await this.formatProfileEmbed(user);
+            interaction.reply({ 
                 content: `Here is ${user}'s profile`,
                 embeds: [embed], 
                 ephemeral: true 
@@ -77,8 +77,8 @@ export default class profile implements IBotInteraction {
                 "Since you're a student, you can't view other students' profiles." : 
                 'Here is your profile.');
             user = interaction.user;
-            const embed = this.formatProfileEmbed(user);
-            await interaction.reply({
+            const embed = await this.formatProfileEmbed(user);
+            interaction.reply({
                 content: message, 
                 embeds: [embed], 
                 ephemeral: true

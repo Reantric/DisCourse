@@ -55,8 +55,8 @@ async runCommand(interaction: any, Bot: Client): Promise<void> {
     let aid = helpId;
     let transfer:any;
     helpId++;
-    if(questionInfo.has(interaction.options.getInteger("id").toString())){
-        let info = questionInfo.get(id);
+    if(await questionInfo.has(interaction.options.getInteger("id").toString())){
+        let info = await questionInfo.get(id);
         interaction.reply({content:"Your answer has been sent.",ephemeral:true})
         interaction.channel.messages.fetch(info[0])
         .then((msg:any) => {

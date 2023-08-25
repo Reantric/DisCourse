@@ -137,7 +137,7 @@ async runCommand(interaction: any, Bot: Client): Promise<void> {
                 answered.set(i.member!.user.id,false);
                 if(i.values[0]==="r"){    
                     const points = interaction.options.getInteger("points");
-                    db.set(`${i.member!.user.id}.points`,db.get(`${i.member!.user.id}.points`)+points);
+                    await db.set(`${i.member!.user.id}.points`,await db.get(`${i.member!.user.id}.points`)+points);
                     i.followUp({content: 'You are correct!', ephemeral:true});
                     let member = i.member!.user.id;
                     responses[member][1]="r";
