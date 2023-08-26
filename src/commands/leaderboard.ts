@@ -1,10 +1,10 @@
 import * as Discord from "discord.js";
 import { IBotInteraction } from "../api/capi";
 import { EmbedBuilder } from "discord.js";
+import { CommandAccess } from "../types";
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 const { SlashCommandBuilder } = require('@discordjs/builders');
-import { setupInfo } from "../setup";
 
 //do i need that what does it even
 //when i wrote this code, only god and i knew how it worked
@@ -47,7 +47,7 @@ export default class leaderboard implements IBotInteraction {
         .setName(this.name())
         .setDescription(this.help())
     }
-    perms(): "teacher" | "student" | "both" {
+    perms(): CommandAccess {
         return 'both';
      }
 
@@ -59,8 +59,6 @@ export default class leaderboard implements IBotInteraction {
         })
 
         for(const o of await db.all()){
-            if (o.ID == setupInfo.guildID)
-                continue;
             if(guildArray.includes(o.ID)){
                 let pts;
                 if (typeof o.data === 'string')

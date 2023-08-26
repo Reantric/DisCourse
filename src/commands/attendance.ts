@@ -2,6 +2,7 @@ const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 import { IBotInteraction } from "../api/capi";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, Client, Collection, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, InteractionCollector, Message, Role, TextChannel } from "discord.js";
+import { CommandAccess } from "../types";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 export default class attendance implements IBotInteraction {
@@ -22,7 +23,7 @@ export default class attendance implements IBotInteraction {
         return command === this.name();
     }
 
-    perms(): "teacher" | "student" | "both" {
+    perms(): CommandAccess {
        return 'teacher';
     }
 

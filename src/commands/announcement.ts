@@ -1,7 +1,8 @@
-import { ApplicationCommand, ApplicationCommandOption, ApplicationCommandStringOption, Client, CommandInteraction, Role, SlashCommandStringOption } from "discord.js";
+import { Client, CommandInteraction, Role, SlashCommandStringOption } from "discord.js";
 import { TextChannel } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { IBotInteraction } from "../api/capi";
+import { CommandAccess } from "../types";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 export default class announcement implements IBotInteraction {
@@ -40,7 +41,7 @@ export default class announcement implements IBotInteraction {
         return commandBuilder;
     }
     
-    perms(): "teacher" | "student" | "both" {
+    perms(): CommandAccess {
         return 'teacher';
     }
 

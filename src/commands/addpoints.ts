@@ -1,9 +1,9 @@
 import * as Discord from "discord.js";
 import { IBotInteraction } from "../api/capi";
+import { CommandAccess } from "../types";
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 const { SlashCommandBuilder } = require('@discordjs/builders');
-
 
 export default class addpoints implements IBotInteraction {
     private readonly aliases = ["addpoints"]
@@ -32,7 +32,7 @@ export default class addpoints implements IBotInteraction {
             .setDescription('How many points are you giving?')
             .setRequired(true));
 }
-perms(): "teacher" | "student" | "both" {
+perms(): CommandAccess {
     return 'teacher';
  }
 

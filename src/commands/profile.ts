@@ -1,6 +1,7 @@
 import { Client, Role, Interaction, CommandInteraction, User, RoleManager, GuildMemberRoleManager } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { IBotInteraction } from "../api/capi";
+import { CommandAccess } from "../types";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
@@ -28,7 +29,7 @@ export default class profile implements IBotInteraction {
 		.setDescription(this.help())
         .addUserOption((option:any) => option.setName('target').setDescription('Select a user'));
     }
-    perms(): "teacher" | "student" | "both" {
+    perms(): CommandAccess {
         return 'both';
     }
 

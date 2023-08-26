@@ -1,6 +1,7 @@
 import { Client, Collection, GuildMember, InteractionCollector, Message, Role, SelectMenuInteraction, TextChannel } from "discord.js";
 import { IBotInteraction } from "../api/capi";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder } from "discord.js";
+import { CommandAccess } from "../types";
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 var qid = db.table('id');
@@ -37,7 +38,7 @@ export default class mcq implements IBotInteraction {
         .addStringOption((option:any) => option.setName('wrong-answer4').setDescription('Wrong answer choice 4:').setRequired(false))
         ;
     }
-    perms(): "teacher" | "student" | "both" {
+    perms(): CommandAccess {
         return 'teacher';
      }
 

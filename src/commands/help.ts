@@ -3,6 +3,7 @@ import { EmbedBuilder } from "discord.js";
 import { IBotInteraction } from "../api/capi";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 import { helpUtil } from "..";
+import { CommandAccess } from "../types";
 
 export default class help implements IBotInteraction {
 
@@ -26,7 +27,7 @@ export default class help implements IBotInteraction {
 		.setName(this.name())
 		.setDescription(this.help())
     }
-    perms(): "teacher" | "student" | "both" {
+    perms(): CommandAccess {
         return 'both';
      }
 

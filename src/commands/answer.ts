@@ -4,6 +4,7 @@ import { EmbedBuilder } from "discord.js";
 import { ActionRowBuilder, ButtonBuilder } from "discord.js";
 import { ButtonStyle } from "discord.js";
 import { IBotInteraction } from "../api/capi";
+import { CommandAccess } from "../types";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 const { QuickDB } = require("quick.db");
@@ -35,7 +36,7 @@ export default class answer implements IBotInteraction {
     .addIntegerOption((option:any) => option.setName('id').setDescription('Enter the id of the question you want to respond to:').setRequired(true))
     .addStringOption((option:any) => option.setName('answer').setDescription('Enter the id of the question you want to respond to:').setRequired(true))
 }
-perms(): "teacher" | "student" | "both" {
+perms(): CommandAccess {
     return 'student';
  }
 

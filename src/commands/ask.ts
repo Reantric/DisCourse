@@ -1,6 +1,7 @@
 import { Client, Role, SlashCommandStringOption } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { IBotInteraction } from "../api/capi";
+import { CommandAccess } from "../types";
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
@@ -37,7 +38,7 @@ export default class ask implements IBotInteraction {
         return commandBuilder
     }
 
-    perms(): "teacher" | "student" | "both" {
+    perms(): CommandAccess {
         return "student";
     }
 

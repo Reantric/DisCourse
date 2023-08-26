@@ -1,6 +1,7 @@
 import { Embed, EmbedBuilder, InteractionCollector, StringSelectMenuInteraction, ActionRowBuilder, ButtonBuilder } from "discord.js";
 import { Client, ButtonStyle } from "discord.js";
 import { IBotInteraction } from "../api/capi";
+import { CommandAccess } from "../types";
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 const { SlashCommandBuilder } = require('@discordjs/builders');
@@ -21,9 +22,11 @@ export default class buy implements IBotInteraction {
     cooldown(): number{
         return 2;
     }
+
     isThisInteraction(command: string): boolean {
         return this.aliases.includes(command);
     }
+
     data(): any {
         return new SlashCommandBuilder()
         .setName(this.name())
@@ -31,7 +34,7 @@ export default class buy implements IBotInteraction {
         .addStringOption((option:any) => option.setName('role_name').setDescription('Enter a name for your custom role!').setRequired(true))
         .addStringOption((option:any) => option.setName('color').setDescription('Enter a solid color').setRequired(true));
     }
-    perms(): "teacher" | "student" | "both" {
+    perms(): CommandAccess {
         return 'both';
      }
 

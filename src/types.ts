@@ -1,0 +1,1 @@
+export type CommandAccess = "teacher" | "student" | "both";

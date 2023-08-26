@@ -1,5 +1,6 @@
 import * as Discord from "discord.js";
 import { IBotInteraction } from "../api/capi";
+import { CommandAccess } from "../types";
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 const { SlashCommandBuilder } = require('@discordjs/builders');
@@ -28,7 +29,7 @@ export default class strike implements IBotInteraction {
         .setDescription(this.help())
         .addUserOption((option: any) => option.setName('target').setDescription('Select a student to strike').setRequired(true));
     }
-    perms(): "teacher" | "student" | "both" {
+    perms(): CommandAccess {
         return 'teacher';
      }
 
