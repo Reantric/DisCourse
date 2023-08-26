@@ -5,7 +5,6 @@ var eventFiles = fs.readdirSync(`${__dirname}/events`);
 export let setupInfo = {
     //"prefix": "!",
     "commands": commandFiles,
-    "events": eventFiles,
-    "guildID":"775700759869259776"
+    "events": eventFiles
 }
 
