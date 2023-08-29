@@ -37,7 +37,7 @@ const student = {
     questions: [],
     points:0,
     strikes:0,
-    messages:[],
+    messages: [],
     absences:0
 }
 
