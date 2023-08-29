@@ -39,12 +39,6 @@ async function sendCommands(commands: Map<string, IBotInteraction>): Promise<App
                 body: Array.from(commands.values()).map((command) => command.data().toJSON())
             },
         ) as ApplicationCommand[];
-        await rest.put(
-            Routes.applicationGuildCommands(process.env.CLIENT_ID!, setupInfo.guildID),
-            { 
-                body: []
-            },
-        ) as ApplicationCommand[];
         return applicationCommands;
     } catch (error) {
         console.error(error);

@@ -33,10 +33,6 @@ let commands: IBotInteraction[] = [];
 let events: IBotEvent[] = [];
 const commandCooldowns: any = new Collection();
 
-function randint(min: number,max: number) {
-    return Math.floor(Math.random()*(max-min+1)+min);
-}
-
 const student = {
     questions: [],
     points:0,
